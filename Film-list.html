@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<title>Tim &amp; Siobhan's film list</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23d6336c' d='M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=Young+Serif&display=swap" rel="stylesheet">
+<style>
+  :root {
+    color-scheme: light dark;
+    --bg: #f7e9e6;
+    --panel: #fffaf8;
+    --text: #2b1626;
+    --muted: #7d6472;
+    --border: #ecd3cf;
+    --accent: #d6336c;
+    --soft: #fbdbe4;
+    --gold: #c98a2b;
+    --on-accent: #ffffff;
+    --toast-bg: #2b1626;
+    --toast-text: #f8e6e8;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1e0f1b;
+      --panel: #2b1626;
+      --text: #f8e6e8;
+      --muted: #b99aaa;
+      --border: #4a2b41;
+      --accent: #ff5c8f;
+      --soft: #4a2040;
+      --on-accent: #1e0f1b;
+      --toast-bg: #120810;
+      --toast-text: #f8e6e8;
+    }
+  }
+
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background: var(--bg);
+    color: var(--text);
+    font: 16px/1.5 "Figtree", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  .page {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 18px;
+    padding-top: calc(18px + env(safe-area-inset-top, 0px));
+    padding-bottom: calc(40px + env(safe-area-inset-bottom, 0px));
+  }
+
+  button, input { font: inherit; color: inherit; }
+  button { cursor: pointer; }
+  :focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+
+  /* Header */
+  h1 {
+    margin: 14px 0 8px;
+    font-family: "Young Serif", Georgia, serif;
+    font-weight: 400;
+    font-size: clamp(2rem, 1.2rem + 4vw, 3rem);
+    line-height: 1.1;
+    text-wrap: balance;
+  }
+  .progress-text { margin: 0 0 10px; color: var(--muted); }
+  .bar {
+    height: 6px;
+    border-radius: 999px;
+    background: var(--border);
+    overflow: hidden;
+  }
+  .bar > span {
+    display: block;
+    height: 100%;
+    width: 0;
+    border-radius: 999px;
+    background: var(--accent);
+    transition: width .6s cubic-bezier(.2, .8, .2, 1);
+  }
+
+  /* Add form */
+  .add { display: flex; gap: 8px; margin: 20px 0 8px; }
+  .add input {
+    flex: 1;
+    min-width: 0;
+    padding: 12px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    background: var(--panel);
+  }
+  .add input::placeholder { color: var(--muted); opacity: 1; }
+  .btn {
+    padding: 0 18px;
+    min-height: 46px;
+    border: 0;
+    border-radius: 10px;
+    background: var(--accent);
+    color: var(--on-accent);
+    font-weight: 600;
+  }
+  .status { min-height: 1.5em; margin: 0 0 8px; color: var(--muted); font-size: .9rem; }
+  .status.error { color: var(--text); font-weight: 600; }
+
+  /* Filters */
+  .filters { display: flex; flex-wrap: wrap; gap: 8px; margin: 4px 0 14px; }
+  .pill {
+    padding: 8px 16px;
+    border: 1.5px solid var(--border);
+    border-radius: 999px;
+    background: var(--panel);
+    font-weight: 600;
+    font-size: .95rem;
+  }
+  .pill[aria-pressed="true"] {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--on-accent);
+  }
+
+  /* List */
+  .list { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+  .empty {
+    border: 2px dashed var(--border);
+    border-radius: 14px;
+    padding: 24px 16px;
+    text-align: center;
+    color: var(--muted);
+  }
+
+  .film {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    column-gap: 6px;
+    align-items: start;
+    padding: 10px 10px 12px 8px;
+    background: var(--panel);
+    border: 1.5px solid var(--border);
+    border-radius: 14px;
+  }
+  .film.watched { background: var(--soft); }
+
+  .tick {
+    grid-column: 1;
+    grid-row: 1 / span 2;
+    width: 44px;
+    height: 44px;
+    display: grid;
+    place-items: center;
+    padding: 0;
+    border: 0;
+    border-radius: 12px;
+    background: none;
+    color: var(--accent);
+  }
+  .tick svg { width: 34px; height: 34px; display: block; }
+  .tick path { fill: none; stroke: currentColor; stroke-width: 2; stroke-linejoin: round; }
+  .film.watched .tick path { fill: currentColor; }
+  .tick.pop svg { animation: pop .38s ease; }
+  @keyframes pop { 0% { transform: scale(1); } 40% { transform: scale(1.35); } 100% { transform: scale(1); } }
+
+  .title {
+    grid-column: 2;
+    grid-row: 1;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    font-weight: 700;
+    overflow-wrap: anywhere;
+  }
+  .film.watched .title { opacity: .55; text-decoration: line-through; }
+
+  .del {
+    grid-column: 3;
+    grid-row: 1;
+    width: 36px;
+    height: 44px;
+    padding: 0;
+    border: 0;
+    border-radius: 10px;
+    background: none;
+    color: var(--muted);
+    font-size: 1.4rem;
+    line-height: 1;
+  }
+  @media (hover: hover) { .del:hover { color: var(--accent); } }
+
+  .meta {
+    grid-column: 2 / 4;
+    grid-row: 2;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 18px;
+    color: var(--muted);
+    font-size: .9rem;
+  }
+  .date { display: inline-flex; align-items: center; gap: 8px; }
+  .date input {
+    padding: 4px 8px;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    background: var(--bg);
+    color: var(--text);
+    font-size: .9rem;
+  }
+  .film.watched .date input { background: var(--panel); }
+  .rating { display: inline-flex; align-items: center; gap: 4px; }
+  .rating[hidden] { display: none; }
+  .rate {
+    width: 30px;
+    height: 30px;
+    display: grid;
+    place-items: center;
+    padding: 0;
+    border: 0;
+    border-radius: 8px;
+    background: none;
+  }
+  .rate svg { width: 20px; height: 20px; display: block; }
+  .rate path { fill: none; stroke: var(--muted); stroke-width: 2; stroke-linejoin: round; }
+  .rate.on path { fill: var(--accent); stroke: var(--accent); }
+
+  /* Sign in */
+  .card {
+    margin-top: 24px;
+    padding: 20px;
+    background: var(--panel);
+    border: 1.5px solid var(--border);
+    border-radius: 14px;
+  }
+  .card p { margin: 0 0 14px; color: var(--muted); }
+  .card label { display: block; margin-bottom: 12px; font-weight: 600; font-size: .95rem; }
+  .card input {
+    display: block;
+    width: 100%;
+    margin-top: 4px;
+    padding: 12px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    background: var(--bg);
+    font-weight: 400;
+  }
+  .card .btn { width: 100%; margin-top: 4px; }
+
+  .foot { margin-top: 28px; text-align: center; }
+  .link {
+    padding: 6px 10px;
+    border: 0;
+    border-radius: 8px;
+    background: none;
+    color: var(--muted);
+    font-size: .9rem;
+    text-decoration: underline;
+  }
+
+  /* Toast and floating heart */
+  .toast {
+    position: fixed;
+    top: calc(14px + env(safe-area-inset-top, 0px));
+    left: 50%;
+    z-index: 20;
+    max-width: calc(100% - 36px);
+    padding: 10px 20px;
+    border: 1.5px solid var(--border);
+    border-radius: 999px;
+    background: var(--toast-bg);
+    color: var(--toast-text);
+    font-weight: 600;
+    text-align: center;
+    pointer-events: none;
+    opacity: 0;
+    transform: translate(-50%, -24px);
+    transition: opacity .3s ease, transform .3s ease;
+  }
+  .toast::before { content: "\2665"; margin-right: 8px; color: var(--gold); }
+  .toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+  .floaty {
+    position: fixed;
+    left: 0;
+    z-index: 15;
+    width: 40px;
+    height: 40px;
+    pointer-events: none;
+    color: var(--accent);
+  }
+  .floaty svg { width: 100%; height: 100%; display: block; fill: currentColor; animation: bob 1.1s ease-in-out infinite alternate; }
+  @keyframes bob { from { transform: translateY(-18px); } to { transform: translateY(18px); } }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+  }
+</style>
+</head>
+<body>
+<main class="page">
+  <header>
+    <h1>Tim &amp; Siobhan's film list</h1>
+    <p class="progress-text" id="progressText">Films to watch together</p>
+    <div class="bar" id="bar" role="progressbar" aria-label="Films watched together" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span id="barFill"></span></div>
+  </header>
+
+  <!-- Sign in (only shown when the shared list is set up) -->
+  <section class="card" id="auth" hidden>
+    <p>Sign in to see the shared list.</p>
+    <form id="authForm">
+      <label>Email
+        <input type="email" id="authEmail" autocomplete="username" required>
+      </label>
+      <label>Password
+        <input type="password" id="authPassword" autocomplete="current-password" required>
+      </label>
+      <button class="btn" type="submit">Sign in</button>
+    </form>
+    <p class="status" id="authStatus" role="status" style="margin:12px 0 0"></p>
+  </section>
+
+  <section id="app" hidden>
+    <form class="add" id="addForm">
+      <input type="text" id="addInput" placeholder="Add a film" maxlength="120" autocomplete="off" enterkeyhint="done" aria-label="Add a film">
+      <button class="btn" type="submit">Add film</button>
+    </form>
+    <p class="status" id="status" role="status"></p>
+
+    <div class="filters" role="group" aria-label="Filter films">
+      <button class="pill" type="button" data-filter="all" aria-pressed="true">All</button>
+      <button class="pill" type="button" data-filter="todo" aria-pressed="false">To watch</button>
+      <button class="pill" type="button" data-filter="watched" aria-pressed="false">Watched</button>
+    </div>
+
+    <div class="empty" id="empty" hidden></div>
+    <ul class="list" id="list"></ul>
+
+    <div class="foot" id="foot" hidden>
+      <button class="link" type="button" id="signOut">Sign out</button>
+    </div>
+  </section>
+</main>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+/* ==========================================================================
+   SETUP (shared list with Firebase)
+   1. Firebase console > Project settings > Your apps > Add a web app, then
+      paste the config values below.
+   2. Build > Authentication > enable Email/Password, then add two users
+      (Tim and Siobhan) by hand under the Users tab.
+   3. Build > Firestore Database > create it, then in Rules add:
+
+        match /films/{film} {
+          allow read, write: if request.auth != null
+            && request.auth.token.email in [
+              'TIM_EMAIL_HERE', 'SIOBHAN_EMAIL_HERE'
+            ];
+        }
+
+   Until the config is filled in, the list saves to this device only.
+   ========================================================================== */
+const FIREBASE_CONFIG = {
+  apiKey: "PASTE_API_KEY",
+  authDomain: "PASTE_PROJECT_ID.firebaseapp.com",
+  projectId: "PASTE_PROJECT_ID",
+  storageBucket: "PASTE_PROJECT_ID.firebasestorage.app",
+  messagingSenderId: "PASTE_SENDER_ID",
+  appId: "PASTE_APP_ID"
+};
+const COLLECTION = "films";
+const LOCAL_KEY = "tim-siobhan-film-list-v1";
+const FIREBASE_VERSION = "10.14.1";
+
+const HEART_PATH = "M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z";
+const heartSvg = '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="' + HEART_PATH + '"/></svg>';
+
+const $ = (sel) => document.querySelector(sel);
+const els = {
+  progressText: $("#progressText"),
+  bar: $("#bar"),
+  barFill: $("#barFill"),
+  auth: $("#auth"),
+  authForm: $("#authForm"),
+  authEmail: $("#authEmail"),
+  authPassword: $("#authPassword"),
+  authStatus: $("#authStatus"),
+  app: $("#app"),
+  addForm: $("#addForm"),
+  addInput: $("#addInput"),
+  status: $("#status"),
+  list: $("#list"),
+  empty: $("#empty"),
+  foot: $("#foot"),
+  signOut: $("#signOut"),
+  toast: $("#toast")
+};
+
+let films = [];
+let filter = "all";
+let store = null;
+let baseStatus = "";
+const rows = new Map();
+
+const reduceMotion = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+/* ---------- Status line ---------- */
+function setStatus(text, isError) {
+  els.status.textContent = text;
+  els.status.classList.toggle("error", !!isError);
+}
+function clearStatus() { setStatus(baseStatus, false); }
+function saveFailed() { setStatus("Couldn't save that change. Try again.", true); }
+
+/* ---------- Stores ---------- */
+function cleanFilm(id, d) {
+  const rating = Number(d.rating);
+  return {
+    id: id,
+    title: String(d.title || "").slice(0, 120),
+    plannedDate: typeof d.plannedDate === "string" ? d.plannedDate : "",
+    watched: d.watched === true,
+    rating: Number.isFinite(rating) ? Math.max(0, Math.min(5, Math.round(rating))) : 0,
+    created: Number(d.created) || 0
+  };
+}
+
+function makeLocalStore() {
+  let items = [];
+  let onChange = () => {};
+  try {
+    const raw = JSON.parse(localStorage.getItem(LOCAL_KEY) || "[]");
+    if (Array.isArray(raw)) items = raw.map((d) => cleanFilm(d.id || String(Math.random()), d));
+  } catch (e) { items = []; }
+
+  function commit() {
+    try { localStorage.setItem(LOCAL_KEY, JSON.stringify(items)); }
+    catch (e) { saveFailed(); }
+    onChange(items.slice());
+  }
+  return {
+    shared: false,
+    subscribe(cb) { onChange = cb; cb(items.slice()); },
+    add(f) {
+      items.push(cleanFilm("l" + Date.now().toString(36) + Math.random().toString(36).slice(2, 7), f));
+      commit();
+      return Promise.resolve();
+    },
+    update(id, patch) {
+      items = items.map((x) => x.id === id ? cleanFilm(id, Object.assign({}, x, patch)) : x);
+      commit();
+      return Promise.resolve();
+    },
+    remove(id) {
+      items = items.filter((x) => x.id !== id);
+      commit();
+      return Promise.resolve();
+    }
+  };
+}
+
+async function makeFirebaseStore() {
+  const base = "https://www.gstatic.com/firebasejs/" + FIREBASE_VERSION;
+  const [appMod, authMod, fsMod] = await Promise.all([
+    import(base + "/firebase-app.js"),
+    import(base + "/firebase-auth.js"),
+    import(base + "/firebase-firestore.js")
+  ]);
+  const app = appMod.initializeApp(FIREBASE_CONFIG);
+  const auth = authMod.getAuth(app);
+  const db = fsMod.getFirestore(app);
+  const col = fsMod.collection(db, COLLECTION);
+  let unsub = null;
+
+  return {
+    shared: true,
+    auth: {
+      onChange(cb) { authMod.onAuthStateChanged(auth, cb); },
+      signIn(email, pw) { return authMod.signInWithEmailAndPassword(auth, email, pw); },
+      signOut() { return authMod.signOut(auth); }
+    },
+    subscribe(cb, onError) {
+      this.unsubscribe();
+      unsub = fsMod.onSnapshot(
+        fsMod.query(col, fsMod.orderBy("created")),
+        (snap) => cb(snap.docs.map((d) => cleanFilm(d.id, d.data()))),
+        onError
+      );
+    },
+    unsubscribe() { if (unsub) { unsub(); unsub = null; } },
+    add(f) { return fsMod.addDoc(col, f); },
+    update(id, patch) { return fsMod.updateDoc(fsMod.doc(db, COLLECTION, id), patch); },
+    remove(id) { return fsMod.deleteDoc(fsMod.doc(db, COLLECTION, id)); }
+  };
+}
+
+/* ---------- Rendering ---------- */
+function createRow(id) {
+  const li = document.createElement("li");
+  li.className = "film";
+  li.dataset.id = id;
+  let rate = "";
+  for (let n = 1; n <= 5; n++) {
+    rate += '<button type="button" class="rate" data-action="rate" data-n="' + n + '" aria-label="Rate ' + n + ' out of 5">' + heartSvg + "</button>";
+  }
+  li.innerHTML =
+    '<button type="button" class="tick" data-action="tick">' + heartSvg + "</button>" +
+    '<div class="title"></div>' +
+    '<button type="button" class="del" data-action="del">&times;</button>' +
+    '<div class="meta">' +
+      '<label class="date"><span>Watching on</span><input type="date"></label>' +
+      '<div class="rating" role="group" aria-label="Rating" hidden><span aria-hidden="true">Rating</span>' + rate + "</div>" +
+    "</div>";
+  li._watched = null;
+  return li;
+}
+
+function updateRow(li, f) {
+  li.classList.toggle("watched", f.watched);
+  const titleEl = li.querySelector(".title");
+  if (titleEl.textContent !== f.title) titleEl.textContent = f.title;
+
+  const tick = li.querySelector(".tick");
+  tick.setAttribute("aria-pressed", String(f.watched));
+  tick.setAttribute("aria-label", "Watched: " + f.title);
+  if (li._watched === false && f.watched && !reduceMotion()) {
+    tick.classList.remove("pop");
+    void tick.offsetWidth;
+    tick.classList.add("pop");
+  }
+  li._watched = f.watched;
+
+  li.querySelector(".del").setAttribute("aria-label", "Remove " + f.title);
+
+  const dateInput = li.querySelector('input[type="date"]');
+  if (dateInput.value !== f.plannedDate && document.activeElement !== dateInput) dateInput.value = f.plannedDate;
+
+  li.querySelector(".rating").hidden = !f.watched;
+  li.querySelectorAll(".rate").forEach((btn) => {
+    const n = Number(btn.dataset.n);
+    btn.classList.toggle("on", n <= f.rating);
+    btn.setAttribute("aria-pressed", String(n === f.rating));
+  });
+}
+
+function render() {
+  const total = films.length;
+  const watched = films.filter((f) => f.watched).length;
+
+  els.progressText.textContent = total ? watched + " of " + total + " watched together" : "Films to watch together";
+  const pct = total ? (watched / total) * 100 : 0;
+  els.barFill.style.width = pct + "%";
+  els.bar.setAttribute("aria-valuenow", String(Math.round(pct)));
+
+  document.querySelectorAll(".pill").forEach((b) => {
+    b.setAttribute("aria-pressed", String(b.dataset.filter === filter));
+  });
+
+  const visible = films.filter((f) =>
+    filter === "watched" ? f.watched : filter === "todo" ? !f.watched : true
+  );
+
+  const visibleIds = new Set(visible.map((f) => f.id));
+  rows.forEach((el, id) => {
+    if (!visibleIds.has(id)) { el.remove(); rows.delete(id); }
+  });
+  const ordered = visible.map((f) => {
+    let el = rows.get(f.id);
+    if (!el) { el = createRow(f.id); rows.set(f.id, el); }
+    updateRow(el, f);
+    return el;
+  });
+  ordered.forEach((el, i) => {
+    if (els.list.children[i] !== el) els.list.insertBefore(el, els.list.children[i] || null);
+  });
+
+  let msg = "";
+  if (!total) msg = "No films yet. Add the first one above.";
+  else if (!visible.length) msg = filter === "watched" ? "No watched films yet." : "You've watched everything on the list.";
+  els.empty.textContent = msg;
+  els.empty.hidden = !msg;
+}
+
+/* ---------- Milestones ---------- */
+let toastTimer = null;
+function showToast(text) {
+  els.toast.textContent = text;
+  els.toast.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => els.toast.classList.remove("show"), reduceMotion() ? 2500 : 4000);
+}
+
+function floatHeart() {
+  if (typeof Element.prototype.animate !== "function") return;
+  const h = document.createElement("div");
+  h.className = "floaty";
+  h.innerHTML = heartSvg;
+  h.style.top = (15 + Math.random() * 65) + "vh";
+  document.body.appendChild(h);
+  const anim = h.animate(
+    [{ transform: "translateX(-60px)" }, { transform: "translateX(" + (window.innerWidth + 60) + "px)" }],
+    { duration: 6000, easing: "linear" }
+  );
+  anim.onfinish = () => h.remove();
+}
+
+function celebrate(count) {
+  showToast(count === 1 ? "First film watched together" : count + " films watched together");
+  if (!reduceMotion()) floatHeart();
+}
+
+/* ---------- Actions ---------- */
+function run(promise) {
+  Promise.resolve(promise).then(clearStatus).catch(saveFailed);
+}
+
+els.addForm.addEventListener("submit", (e) => {
+  e.preventDefault();
+  const title = els.addInput.value.trim().slice(0, 120);
+  if (!title) return;
+  els.addInput.value = "";
+  els.addInput.focus();
+  run(store.add({ title: title, plannedDate: "", watched: false, rating: 0, created: Date.now() }));
+});
+
+els.list.addEventListener("click", (e) => {
+  const btn = e.target.closest("[data-action]");
+  if (!btn) return;
+  const li = btn.closest(".film");
+  const f = films.find((x) => x.id === li.dataset.id);
+  if (!f) return;
+
+  const action = btn.dataset.action;
+  if (action === "tick") {
+    const nowWatched = !f.watched;
+    if (nowWatched) {
+      const count = films.filter((x) => x.watched).length + 1;
+      if (count === 1 || count % 5 === 0) celebrate(count);
+    }
+    run(store.update(f.id, { watched: nowWatched }));
+  } else if (action === "del") {
+    run(store.remove(f.id));
+  } else if (action === "rate") {
+    const n = Number(btn.dataset.n);
+    run(store.update(f.id, { rating: f.rating === n ? 0 : n }));
+  }
+});
+
+els.list.addEventListener("change", (e) => {
+  if (!e.target.matches('input[type="date"]')) return;
+  const li = e.target.closest(".film");
+  run(store.update(li.dataset.id, { plannedDate: e.target.value }));
+});
+
+document.querySelectorAll(".pill").forEach((b) => {
+  b.addEventListener("click", () => { filter = b.dataset.filter; render(); });
+});
+
+/* ---------- Start up ---------- */
+function useLocal(note) {
+  store = makeLocalStore();
+  baseStatus = note;
+  els.app.hidden = false;
+  clearStatus();
+  store.subscribe((items) => { films = items; render(); });
+}
+
+function isConfigured() {
+  return FIREBASE_CONFIG.apiKey && !/^PASTE/.test(FIREBASE_CONFIG.apiKey) && !/^PASTE/.test(FIREBASE_CONFIG.projectId);
+}
+
+async function init() {
+  render();
+  if (!isConfigured()) {
+    useLocal("The shared list isn't set up yet, so films are saved on this device only.");
+    return;
+  }
+  try {
+    store = await makeFirebaseStore();
+  } catch (err) {
+    useLocal("The shared list isn't available, so films are saved on this device only.");
+    return;
+  }
+
+  els.signOut.addEventListener("click", () => store.auth.signOut());
+
+  els.authForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    els.authStatus.textContent = "Signing in...";
+    try {
+      await store.auth.signIn(els.authEmail.value.trim(), els.authPassword.value);
+      els.authPassword.value = "";
+      els.authStatus.textContent = "";
+    } catch (err) {
+      const bad = ["auth/invalid-credential", "auth/wrong-password", "auth/user-not-found", "auth/invalid-email"];
+      els.authStatus.textContent = bad.indexOf(err && err.code) >= 0
+        ? "That email and password don't match."
+        : "Couldn't sign in. Check your connection and try again.";
+    }
+  });
+
+  store.auth.onChange((user) => {
+    if (user) {
+      els.auth.hidden = true;
+      els.app.hidden = false;
+      els.foot.hidden = false;
+      baseStatus = "";
+      clearStatus();
+      store.subscribe(
+        (items) => { films = items; render(); },
+        (err) => {
+          if (err && err.code === "permission-denied") {
+            setStatus("This account can't open the shared list. Sign out and use the other login.", true);
+          } else {
+            setStatus("Lost connection to the shared list. Reload the page to reconnect.", true);
+          }
+        }
+      );
+    } else {
+      store.unsubscribe();
+      films = [];
+      rows.forEach((el) => el.remove());
+      rows.clear();
+      render();
+      els.app.hidden = true;
+      els.foot.hidden = true;
+      els.auth.hidden = false;
+    }
+  });
+}
+
+init();
+</script>
+</body>
+</html>
