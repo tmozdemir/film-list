@@ -1,0 +1,1867 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<title>Tim &amp; Siobhan's film and TV list</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23d6336c' d='M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=Young+Serif&display=swap" rel="stylesheet">
+<style>
+  :root {
+    color-scheme: light dark;
+    --bg: #f7e9e6;
+    --panel: #fffaf8;
+    --text: #2b1626;
+    --muted: #7d6472;
+    --border: #ecd3cf;
+    --accent: #d6336c;
+    --soft: #fbdbe4;
+    --gold: #c98a2b;
+    --on-accent: #ffffff;
+    --toast-bg: #2b1626;
+    --toast-text: #f8e6e8;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1e0f1b;
+      --panel: #2b1626;
+      --text: #f8e6e8;
+      --muted: #b99aaa;
+      --border: #4a2b41;
+      --accent: #ff5c8f;
+      --soft: #4a2040;
+      --on-accent: #1e0f1b;
+      --toast-bg: #120810;
+      --toast-text: #f8e6e8;
+    }
+  }
+
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background: var(--bg);
+    color: var(--text);
+    font: 16px/1.5 "Figtree", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  .page {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 18px;
+    padding-top: calc(18px + env(safe-area-inset-top, 0px));
+    padding-bottom: calc(40px + env(safe-area-inset-bottom, 0px));
+  }
+
+  button, input, select { font: inherit; color: inherit; }
+  button { cursor: pointer; }
+  :focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+
+  /* Header */
+  h1 {
+    margin: 14px 0 8px;
+    font-family: "Young Serif", Georgia, serif;
+    font-weight: 400;
+    font-size: clamp(2rem, 1.2rem + 4vw, 3rem);
+    line-height: 1.1;
+    text-wrap: balance;
+  }
+  .progress-text { margin: 0 0 10px; color: var(--muted); }
+  .bar { height: 6px; border-radius: 999px; background: var(--border); overflow: hidden; }
+  .bar > span {
+    display: block;
+    height: 100%;
+    width: 0;
+    border-radius: 999px;
+    background: var(--accent);
+    transition: width .6s cubic-bezier(.2, .8, .2, 1);
+  }
+
+  /* Shared bits */
+  .btn {
+    padding: 0 18px;
+    min-height: 46px;
+    border: 0;
+    border-radius: 10px;
+    background: var(--accent);
+    color: var(--on-accent);
+    font-weight: 600;
+  }
+  .pill {
+    padding: 8px 16px;
+    border: 1.5px solid var(--border);
+    border-radius: 999px;
+    background: var(--panel);
+    font-weight: 600;
+    font-size: .95rem;
+  }
+  .pill[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+  .chip-btn {
+    padding: 4px 12px;
+    border: 1.5px solid var(--border);
+    border-radius: 999px;
+    background: var(--panel);
+    font-size: .85rem;
+    font-weight: 600;
+  }
+  .chip-btn[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+  .link {
+    padding: 6px 4px;
+    border: 0;
+    border-radius: 8px;
+    background: none;
+    color: var(--muted);
+    font-size: .9rem;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .status { min-height: 1.5em; margin: 0 0 8px; color: var(--muted); font-size: .9rem; }
+  .status:empty { min-height: 0; margin: 0; }
+  .status.error { color: var(--text); font-weight: 600; }
+
+  /* Tabs */
+  .tabs { display: flex; gap: 8px; margin: 16px 0 0; }
+
+  /* Add area */
+  .add { display: flex; gap: 8px; margin: 16px 0 8px; }
+  .add input {
+    flex: 1;
+    min-width: 0;
+    padding: 12px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    background: var(--panel);
+  }
+  .add input::placeholder { color: var(--muted); opacity: 1; }
+  .kind { display: flex; align-items: center; gap: 6px; margin: 0 0 8px; }
+  .kind .lbl { color: var(--muted); font-size: .85rem; margin-right: 2px; }
+  .suggest {
+    list-style: none;
+    margin: 0 0 10px;
+    padding: 6px;
+    display: grid;
+    gap: 2px;
+    background: var(--panel);
+    border: 1.5px solid var(--border);
+    border-radius: 14px;
+  }
+  .suggest button {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px;
+    border: 0;
+    border-radius: 10px;
+    background: none;
+    text-align: left;
+  }
+  .suggest img, .suggest .noimg {
+    width: 34px;
+    height: 51px;
+    flex: none;
+    object-fit: cover;
+    border-radius: 6px;
+    background: var(--border);
+  }
+  .s-title { font-weight: 700; }
+  .s-sub { color: var(--muted); font-size: .85rem; }
+  .hint { padding: 6px 8px; color: var(--muted); font-size: .85rem; }
+  @media (hover: hover) { .suggest button:hover { background: var(--soft); } }
+
+  /* Filters */
+  .filters { display: flex; flex-wrap: wrap; gap: 8px; margin: 4px 0 14px; }
+  .panel {
+    margin: 0 0 14px;
+    padding: 14px;
+    background: var(--panel);
+    border: 1.5px solid var(--border);
+    border-radius: 14px;
+  }
+  .fgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 6px; }
+  .fgrid label { display: block; color: var(--muted); font-size: .85rem; font-weight: 600; }
+  .fgrid .wide { grid-column: 1 / -1; }
+  .fgrid input, .fgrid select {
+    display: block;
+    width: 100%;
+    margin-top: 4px;
+    padding: 9px 10px;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    background: var(--bg);
+    color: var(--text);
+    font-size: .95rem;
+    font-weight: 400;
+  }
+
+  /* List */
+  .toolbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; margin: 0 0 12px; }
+  .toolbar label { display: inline-flex; align-items: center; gap: 8px; color: var(--muted); font-size: .85rem; font-weight: 600; }
+  .toolbar select {
+    padding: 6px 10px;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    background: var(--panel);
+    color: var(--text);
+    font-size: .9rem;
+    font-weight: 500;
+  }
+  .dens { display: inline-flex; gap: 6px; }
+
+  .list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+  .letter {
+    position: sticky;
+    top: env(safe-area-inset-top, 0px);
+    z-index: 5;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Young Serif", Georgia, serif;
+    font-size: 1.15rem;
+  }
+  .letter::after { content: ""; flex: 1; height: 1.5px; margin-left: 10px; background: var(--border); }
+  .empty {
+    margin-bottom: 10px;
+    padding: 24px 16px;
+    border: 2px dashed var(--border);
+    border-radius: 14px;
+    text-align: center;
+    color: var(--muted);
+  }
+
+  .film {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    column-gap: 6px;
+    align-items: start;
+    padding: 10px 10px 12px 8px;
+    background: var(--panel);
+    border: 1.5px solid var(--border);
+    border-radius: 14px;
+  }
+  .film.watched { background: var(--soft); }
+  .dyn { display: contents; }
+
+  .tick {
+    grid-column: 1;
+    grid-row: 1 / span 2;
+    width: 44px;
+    height: 44px;
+    display: grid;
+    place-items: center;
+    padding: 0;
+    border: 0;
+    border-radius: 12px;
+    background: none;
+    color: var(--accent);
+  }
+  .tick svg { width: 34px; height: 34px; display: block; }
+  .tick path { fill: none; stroke: currentColor; stroke-width: 2; stroke-linejoin: round; }
+  .film.watched .tick path { fill: currentColor; }
+  .tick.pop svg { animation: pop .38s ease; }
+  @keyframes pop { 0% { transform: scale(1); } 40% { transform: scale(1.35); } 100% { transform: scale(1); } }
+
+  .main { grid-column: 2; grid-row: 1; display: flex; align-items: flex-start; gap: 10px; min-width: 0; }
+  button.main {
+    width: 100%;
+    padding: 4px 0;
+    border: 0;
+    border-radius: 10px;
+    background: none;
+    color: inherit;
+    text-align: left;
+    align-items: center;
+  }
+  .thumb { width: 46px; height: 69px; flex: none; margin-top: 2px; object-fit: cover; border-radius: 8px; background: var(--border); }
+  .thumb.ph {
+    display: grid;
+    place-items: center;
+    color: var(--muted);
+    font-family: "Young Serif", Georgia, serif;
+    font-size: 1.3rem;
+  }
+  .chev { width: 20px; height: 20px; flex: none; margin-left: auto; color: var(--muted); transition: transform .2s ease; }
+  .film.open .chev { transform: rotate(180deg); }
+  .txt { min-width: 0; min-height: 44px; display: flex; flex-direction: column; justify-content: center; }
+  button.main .txt { flex: 1; }
+  .title { font-weight: 700; overflow-wrap: anywhere; }
+  .film.watched .title { opacity: .55; text-decoration: line-through; }
+  .sub { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 8px; color: var(--muted); font-size: .85rem; }
+  .badge { padding: 0 8px; border: 1.5px solid var(--border); border-radius: 999px; font-size: .75rem; font-weight: 600; }
+  .film.watched .badge { border-color: var(--muted); }
+  .avgchip::before { content: "\2665"; margin-right: 3px; color: var(--gold); }
+  .prog { color: var(--muted); font-size: .85rem; }
+
+  .del {
+    grid-column: 3;
+    grid-row: 1;
+    width: 36px;
+    height: 44px;
+    padding: 0;
+    border: 0;
+    border-radius: 10px;
+    background: none;
+    color: var(--muted);
+    font-size: 1.4rem;
+    line-height: 1;
+  }
+  @media (hover: hover) { .del:hover { color: var(--accent); } }
+
+  .meta {
+    grid-column: 2 / -1;
+    grid-row: 2;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 18px;
+    color: var(--muted);
+    font-size: .9rem;
+  }
+  .date { display: inline-flex; align-items: center; gap: 8px; }
+  .date input {
+    padding: 4px 8px;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    background: var(--bg);
+    color: var(--text);
+    font-size: .9rem;
+  }
+  .film.watched .date input { background: var(--panel); }
+  .rating { display: inline-flex; align-items: center; gap: 4px; }
+  .rate {
+    width: 30px;
+    height: 30px;
+    display: grid;
+    place-items: center;
+    padding: 0;
+    border: 0;
+    border-radius: 8px;
+    background: none;
+  }
+  .rate svg { width: 20px; height: 20px; display: block; }
+  .rate path { fill: none; stroke: var(--muted); stroke-width: 2; stroke-linejoin: round; }
+  .rate.on path { fill: var(--accent); stroke: var(--accent); }
+
+  .more {
+    grid-column: 2 / -1;
+    grid-row: 3;
+    justify-self: start;
+    margin-top: 4px;
+    padding: 4px 0;
+    border: 0;
+    background: none;
+    color: var(--text);
+    font-size: .9rem;
+    font-weight: 600;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  /* Compact rows (default) */
+  .film.compact { grid-template-columns: auto 1fr; padding: 6px 10px 6px 6px; }
+  .film.compact .thumb { width: 34px; height: 51px; margin-top: 0; border-radius: 6px; }
+  .film.compact .thumb.ph { font-size: 1.05rem; }
+  .film.compact .txt { min-height: 51px; }
+  .film.compact .title {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .film.compact .meta { display: none; }
+  .film.compact.open .meta { display: flex; margin: 2px 0 0; }
+
+  .details {
+    grid-column: 1 / -1;
+    grid-row: 4;
+    display: grid;
+    gap: 14px;
+    margin-top: 10px;
+    padding-top: 12px;
+    border-top: 1.5px solid var(--border);
+  }
+  .details h4 { margin: 0 0 6px; font-size: .95rem; }
+  .info { display: flex; gap: 12px; }
+  .poster { width: 92px; height: 138px; flex: none; object-fit: cover; border-radius: 10px; background: var(--border); }
+  .facts { min-width: 0; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+  .chip { padding: 1px 10px; border-radius: 999px; background: var(--soft); font-size: .8rem; font-weight: 600; }
+  .film.watched .chip { background: var(--panel); }
+  .fact { margin: 0 0 4px; font-size: .9rem; }
+  .fact b { margin-right: 4px; color: var(--muted); font-weight: 600; }
+  .overview { margin: 0; font-size: .95rem; }
+  .rline { display: flex; justify-content: space-between; align-items: center; gap: 10px; font-size: .9rem; }
+  .dim { color: var(--muted); }
+  .hearts { display: inline-flex; gap: 1px; }
+  .hearts svg { width: 16px; height: 16px; display: block; }
+  .hearts path { fill: none; stroke: var(--muted); stroke-width: 2; stroke-linejoin: round; }
+  .hearts svg.on path { fill: var(--accent); stroke: var(--accent); }
+
+  .seasons { display: grid; gap: 8px; }
+  .season { padding: 8px 12px; background: var(--panel); border: 1.5px solid var(--border); border-radius: 10px; }
+  .season summary {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    list-style: none;
+  }
+  .season summary::-webkit-details-marker { display: none; }
+  .season summary .count { margin-left: auto; color: var(--muted); font-size: .9rem; font-weight: 500; }
+  .season summary::after { content: "+"; color: var(--muted); font-size: 1.2rem; line-height: 1; }
+  .season[open] summary::after { content: "\2212"; }
+  .eps { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0 4px; }
+  .ep {
+    min-width: 38px;
+    height: 38px;
+    padding: 0 6px;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    background: var(--bg);
+    font-weight: 600;
+  }
+  .ep.on { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+
+  .actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; }
+  .typesw { display: inline-flex; gap: 6px; }
+  .match { display: grid; gap: 6px; padding: 10px; background: var(--panel); border: 1.5px solid var(--border); border-radius: 12px; }
+  .matchsearch { display: flex; gap: 8px; }
+  .matchsearch input {
+    flex: 1;
+    min-width: 0;
+    padding: 6px 10px;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    background: var(--bg);
+    color: var(--text);
+  }
+  .match .suggest { margin: 0; padding: 0; border: 0; background: none; }
+
+  /* Sign in / who */
+  .card {
+    margin-top: 24px;
+    padding: 20px;
+    background: var(--panel);
+    border: 1.5px solid var(--border);
+    border-radius: 14px;
+  }
+  .card p { margin: 0 0 14px; color: var(--muted); }
+  .card label { display: block; margin-bottom: 12px; font-weight: 600; font-size: .95rem; }
+  .card input {
+    display: block;
+    width: 100%;
+    margin-top: 4px;
+    padding: 12px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    background: var(--bg);
+    font-weight: 400;
+  }
+  .card .btn { width: 100%; margin-top: 4px; }
+  .who-buttons { display: grid; gap: 10px; }
+
+  .foot { margin-top: 28px; text-align: center; color: var(--muted); font-size: .8rem; }
+  .foot p { margin: 8px 0 0; }
+
+  /* Stats */
+  .stats h2 {
+    margin: 26px 0 10px;
+    font-family: "Young Serif", Georgia, serif;
+    font-weight: 400;
+    font-size: 1.5rem;
+  }
+  .stats h2:first-child { margin-top: 18px; }
+  .sec { margin-bottom: 12px; padding: 14px 16px; background: var(--panel); border: 1.5px solid var(--border); border-radius: 14px; }
+  .sec h3 { margin: 0 0 10px; font-size: 1rem; }
+  .tiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 12px; }
+  .tile { padding: 12px 8px; text-align: center; background: var(--panel); border: 1.5px solid var(--border); border-radius: 14px; }
+  .tile b { display: block; font-family: "Young Serif", Georgia, serif; font-weight: 400; font-size: 1.8rem; line-height: 1.1; }
+  .tile span { color: var(--muted); font-size: .85rem; }
+  .brow { display: grid; grid-template-columns: minmax(70px, 30%) 1fr auto; gap: 10px; align-items: center; margin: 6px 0; font-size: .9rem; }
+  .btrack { height: 10px; border-radius: 999px; background: var(--border); overflow: hidden; }
+  .bfill { display: block; height: 100%; border-radius: 999px; background: var(--accent); }
+  .bval { color: var(--muted); font-size: .85rem; white-space: nowrap; }
+  .months { display: flex; align-items: flex-end; gap: 5px; height: 140px; }
+  .mcol { flex: 1; min-width: 0; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; gap: 3px; }
+  .mbar { width: 100%; max-width: 26px; min-height: 2px; border-radius: 6px 6px 2px 2px; background: var(--accent); }
+  .mnum, .mlabel { color: var(--muted); font-size: .72rem; }
+  .duo { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  @media (max-width: 520px) { .duo { grid-template-columns: 1fr; } }
+  .duo .sec { margin-bottom: 0; }
+  .rank { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+  .rank li { display: flex; justify-content: space-between; gap: 10px; font-size: .92rem; }
+  .rank li span:last-child { color: var(--muted); white-space: nowrap; }
+  .note { margin: 8px 0 0; color: var(--muted); font-size: .85rem; }
+
+  /* A to Z rail */
+  .has-rail .page { padding-right: 26px; }
+  .rail {
+    position: fixed;
+    right: 0;
+    top: 50%;
+    z-index: 12;
+    width: 18px;
+    height: min(72vh, 460px);
+    display: flex;
+    flex-direction: column;
+    transform: translateY(-50%);
+    background: var(--panel);
+    border: 1.5px solid var(--border);
+    border-right: 0;
+    border-radius: 10px 0 0 10px;
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  .rail span { flex: 1; display: grid; place-items: center; color: var(--muted); font-size: .62rem; font-weight: 700; opacity: .4; }
+  .rail span.has { color: var(--text); opacity: 1; }
+  .bubble {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    z-index: 25;
+    width: 72px;
+    height: 72px;
+    display: grid;
+    place-items: center;
+    transform: translate(-50%, -50%);
+    border-radius: 20px;
+    background: var(--accent);
+    color: var(--on-accent);
+    font-family: "Young Serif", Georgia, serif;
+    font-size: 2.4rem;
+    pointer-events: none;
+  }
+
+  /* Toast and floating heart */
+  .toast {
+    position: fixed;
+    top: calc(14px + env(safe-area-inset-top, 0px));
+    left: 50%;
+    z-index: 20;
+    max-width: calc(100% - 36px);
+    padding: 10px 20px;
+    border: 1.5px solid var(--border);
+    border-radius: 999px;
+    background: var(--toast-bg);
+    color: var(--toast-text);
+    font-weight: 600;
+    text-align: center;
+    pointer-events: none;
+    opacity: 0;
+    transform: translate(-50%, -24px);
+    transition: opacity .3s ease, transform .3s ease;
+  }
+  .toast::before { content: "\2665"; margin-right: 8px; color: var(--gold); }
+  .toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+  .floaty { position: fixed; left: 0; z-index: 15; width: 40px; height: 40px; pointer-events: none; color: var(--accent); }
+  .floaty svg { width: 100%; height: 100%; display: block; fill: currentColor; animation: bob 1.1s ease-in-out infinite alternate; }
+  @keyframes bob { from { transform: translateY(-18px); } to { transform: translateY(18px); } }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+  }
+</style>
+</head>
+<body>
+<main class="page">
+  <header>
+    <h1 id="pageTitle">Tim &amp; Siobhan's film and TV list</h1>
+    <p class="progress-text" id="progressText">Films and series to watch together</p>
+    <div class="bar" id="bar" role="progressbar" aria-label="Watched together" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span id="barFill"></span></div>
+  </header>
+
+  <!-- Sign in (only shown when the shared list is set up) -->
+  <section class="card" id="auth" hidden>
+    <p>Sign in to see the shared list.</p>
+    <form id="authForm">
+      <label>Email
+        <input type="email" id="authEmail" autocomplete="username" required>
+      </label>
+      <label>Password
+        <input type="password" id="authPassword" autocomplete="current-password" required>
+      </label>
+      <button class="btn" type="submit">Sign in</button>
+    </form>
+    <p class="status" id="authStatus" role="status" style="margin:12px 0 0"></p>
+  </section>
+
+  <!-- Asked once per login -->
+  <section class="card" id="who" hidden>
+    <p>Who is signing in with this login?</p>
+    <div class="who-buttons">
+      <button class="btn" type="button" data-who="tim">I'm Tim</button>
+      <button class="btn" type="button" data-who="siobhan">I'm Siobhan</button>
+    </div>
+    <p class="status" id="whoStatus" role="status" style="margin:12px 0 0"></p>
+  </section>
+
+  <section class="card" id="fatal" hidden>
+    <p id="fatalText"></p>
+    <button class="link" type="button" id="fatalSignOut">Sign out</button>
+  </section>
+
+  <section id="app" hidden>
+    <nav class="tabs" aria-label="Sections">
+      <button class="pill" type="button" data-view="list" aria-pressed="true">List</button>
+      <button class="pill" type="button" data-view="stats" aria-pressed="false">Stats</button>
+    </nav>
+
+    <div id="listView">
+      <div id="addArea">
+        <form class="add" id="addForm">
+          <input type="text" id="addInput" placeholder="Add a film or series" maxlength="120" autocomplete="off" enterkeyhint="done" aria-label="Add a film or series">
+          <button class="btn" type="submit">Add</button>
+        </form>
+        <div class="kind" role="group" aria-label="Type of title to search for and add">
+          <span class="lbl">Type</span>
+          <button class="chip-btn" type="button" data-kind="any" aria-pressed="true">Any</button>
+          <button class="chip-btn" type="button" data-kind="movie" aria-pressed="false">Film</button>
+          <button class="chip-btn" type="button" data-kind="series" aria-pressed="false">Series</button>
+        </div>
+        <ul class="suggest" id="suggest" hidden></ul>
+      </div>
+      <p class="status" id="status" role="status"></p>
+
+      <div class="filters" role="group" aria-label="Filter by status">
+        <button class="pill" type="button" data-filter="all" aria-pressed="true">All</button>
+        <button class="pill" type="button" data-filter="todo" aria-pressed="false">To watch</button>
+        <button class="pill" type="button" data-filter="watched" aria-pressed="false">Watched</button>
+        <button class="pill" type="button" id="moreBtn" aria-expanded="false" aria-controls="morePanel" aria-pressed="false">Filters</button>
+      </div>
+      <div class="panel" id="morePanel" hidden>
+        <div class="fgrid">
+          <label class="wide">Search titles <input type="search" id="fSearch" autocomplete="off"></label>
+          <label>Type
+            <select id="fKind"><option value="">All</option><option value="movie">Films</option><option value="series">Series</option></select>
+          </label>
+          <label>Genre <select id="fGenre"><option value="">Any</option></select></label>
+          <label>Decade <select id="fDecade"><option value="">Any</option></select></label>
+          <label>Average rating
+            <select id="fRating"><option value="0">Any</option><option value="3">3 or more</option><option value="4">4 or more</option><option value="4.5">4.5 or more</option></select>
+          </label>
+          <label class="wide">Actor <input type="text" id="fActor" list="actorList" autocomplete="off"></label>
+          <datalist id="actorList"></datalist>
+        </div>
+        <button class="link" type="button" id="clearFilters">Clear filters</button>
+      </div>
+
+      <div class="toolbar">
+        <label>Sort
+          <select id="sortSel">
+            <option value="az">A to Z</option>
+            <option value="new">Newest added</option>
+            <option value="old">Oldest added</option>
+            <option value="year">Release year</option>
+            <option value="rating">Rating</option>
+          </select>
+        </label>
+        <div class="dens" role="group" aria-label="Row size">
+          <button class="chip-btn" type="button" data-density="compact" aria-pressed="true">Compact</button>
+          <button class="chip-btn" type="button" data-density="detailed" aria-pressed="false">Detailed</button>
+        </div>
+      </div>
+
+      <div class="empty" id="empty" hidden></div>
+      <ul class="list" id="list"></ul>
+    </div>
+
+    <div class="stats" id="statsView" hidden></div>
+
+    <div class="foot" id="foot">
+      <button class="link" type="button" id="signOut" hidden>Sign out</button>
+      <p id="credit" hidden>Film and TV details from TMDB. This product uses the TMDB API but is not endorsed or certified by TMDB.</p>
+    </div>
+  </section>
+</main>
+
+<div class="rail" id="rail" aria-hidden="true" hidden></div>
+<div class="bubble" id="bubble" aria-hidden="true" hidden></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+/* ==========================================================================
+   SETUP (shared list with Firebase)
+   1. Firebase console > Project settings > Your apps > paste the web app
+      config values below.
+   2. Authentication: Email/Password on, with the two logins added.
+   3. Firestore rules (see the setup notes) must cover: films, profiles, config.
+   4. For film and TV lookups: create a Firestore document config/app with a
+      string field "tmdbKey" holding a free TMDB API key. It is read after
+      sign-in, so it never sits in this public page.
+
+   Until the config is filled in, the list saves to this device only.
+   ========================================================================== */
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyBXuRhpOksJAly8Y1HBdN-Lfn4IUPgaCo8",
+  authDomain: "film-list-ts.firebaseapp.com",
+  projectId: "film-list-ts",
+  storageBucket: "film-list-ts.firebasestorage.app",
+  messagingSenderId: "267217390365",
+  appId: "1:267217390365:web:cc75bbea87fbe90d4baff4",
+  measurementId: "G-C03MH07C6S"
+};
+const COLLECTION = "films";
+const LOCAL_KEY = "tim-siobhan-film-list-v1";
+const FIREBASE_VERSION = "10.14.1";
+const IMG = "https://image.tmdb.org/t/p/";
+
+const HEART_PATH = "M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z";
+const heartSvg = '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="' + HEART_PATH + '"/></svg>';
+const NAMES = { tim: "Tim", siobhan: "Siobhan" };
+const otherKey = (k) => (k === "tim" ? "siobhan" : "tim");
+
+const $ = (sel) => document.querySelector(sel);
+const els = {
+  pageTitle: $("#pageTitle"), progressText: $("#progressText"), bar: $("#bar"), barFill: $("#barFill"),
+  auth: $("#auth"), authForm: $("#authForm"), authEmail: $("#authEmail"), authPassword: $("#authPassword"), authStatus: $("#authStatus"),
+  who: $("#who"), whoStatus: $("#whoStatus"), fatal: $("#fatal"), fatalText: $("#fatalText"), fatalSignOut: $("#fatalSignOut"),
+  app: $("#app"), listView: $("#listView"), statsView: $("#statsView"),
+  addForm: $("#addForm"), addInput: $("#addInput"), suggest: $("#suggest"), addArea: $("#addArea"),
+  status: $("#status"), moreBtn: $("#moreBtn"), morePanel: $("#morePanel"),
+  fSearch: $("#fSearch"), fKind: $("#fKind"), fGenre: $("#fGenre"), fDecade: $("#fDecade"), fRating: $("#fRating"), fActor: $("#fActor"), actorList: $("#actorList"),
+  clearFilters: $("#clearFilters"), list: $("#list"), empty: $("#empty"),
+  signOut: $("#signOut"), credit: $("#credit"), toast: $("#toast"),
+  sortSel: $("#sortSel"), rail: $("#rail"), bubble: $("#bubble")
+};
+
+/* ---------- State ---------- */
+let films = [];
+let store = null;
+let me = "tim";
+let tmdbKey = "";
+let view = "list";
+let addKind = "any";
+let sortMode = "az";
+let density = "compact";
+let baseStatus = "";
+let suggestions = [];
+let matchState = { id: null, loading: false, results: [], error: "", q: "" };
+const filt = { status: "all", q: "", kind: "", genre: "", decade: "", actor: "", rating: 0 };
+const rows = new Map();
+const expanded = new Set();
+const openSeasons = new Set();
+
+const PREF_KEY = "tim-siobhan-film-list-prefs";
+function loadPrefs() {
+  try {
+    const p = JSON.parse(localStorage.getItem(PREF_KEY) || "{}");
+    if (["az", "new", "old", "year", "rating"].indexOf(p.sort) >= 0) sortMode = p.sort;
+    if (p.density === "detailed") density = "detailed";
+  } catch (e) { /* keep defaults */ }
+}
+function savePrefs() {
+  try { localStorage.setItem(PREF_KEY, JSON.stringify({ sort: sortMode, density: density })); } catch (e) { /* ignore */ }
+}
+loadPrefs();
+
+const reduceMotion = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const fmt1 = (n) => String(Math.round(n * 10) / 10);
+
+/* ---------- Status line ---------- */
+function setStatus(text, isError) {
+  els.status.textContent = text;
+  els.status.classList.toggle("error", !!isError);
+}
+function clearStatus() { setStatus(baseStatus, false); }
+function saveFailed() { setStatus("Couldn't save that change. Try again.", true); }
+function run(promise) { Promise.resolve(promise).then(clearStatus).catch(saveFailed); }
+
+/* ---------- Data helpers ---------- */
+function cleanFilm(id, d) {
+  const int = (v, lo, hi) => { v = Math.round(Number(v)); return Number.isFinite(v) ? Math.max(lo, Math.min(hi, v)) : lo; };
+  const strList = (v, n) => (Array.isArray(v) ? v.map(String).slice(0, n) : []);
+  const legacy = int(d.rating, 0, 5);
+  const r = d.ratings && typeof d.ratings === "object" ? d.ratings : {};
+  const seen = {};
+  if (d.seen && typeof d.seen === "object") {
+    Object.keys(d.seen).forEach((k) => {
+      if (/^s\d+$/.test(k) && Array.isArray(d.seen[k])) {
+        seen[k] = d.seen[k].map(Number).filter((n) => Number.isInteger(n) && n > 0);
+      }
+    });
+  }
+  return {
+    id: id,
+    title: String(d.title || "").slice(0, 120),
+    kind: d.kind === "series" ? "series" : "movie",
+    plannedDate: typeof d.plannedDate === "string" ? d.plannedDate : "",
+    watched: d.watched === true,
+    watchedAt: Number(d.watchedAt) || 0,
+    ratings: {
+      tim: r.tim !== undefined ? int(r.tim, 0, 5) : legacy,
+      siobhan: r.siobhan !== undefined ? int(r.siobhan, 0, 5) : legacy
+    },
+    created: Number(d.created) || 0,
+    tmdbId: Number(d.tmdbId) || 0,
+    releaseDate: typeof d.releaseDate === "string" ? d.releaseDate : "",
+    genres: strList(d.genres, 6),
+    cast: strList(d.cast, 8),
+    overview: String(d.overview || "").slice(0, 1500),
+    poster: typeof d.poster === "string" ? d.poster : "",
+    runtime: Number(d.runtime) || 0,
+    seasons: Array.isArray(d.seasons) ? d.seasons.map((n) => int(n, 0, 500)) : [],
+    seen: seen
+  };
+}
+
+function blankFilm(extra) {
+  return Object.assign({
+    title: "", kind: "movie", plannedDate: "", watched: false, watchedAt: 0,
+    ratings: { tim: 0, siobhan: 0 }, created: Date.now(), tmdbId: 0, releaseDate: "",
+    genres: [], cast: [], overview: "", poster: "", runtime: 0, seasons: [], seen: {}
+  }, extra || {});
+}
+
+const collator = new Intl.Collator("en", { numeric: true, sensitivity: "base" });
+function sortKey(f) {
+  let t = f.title.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
+  t = t.replace(/^[^a-z0-9]+/, "");
+  const s = t.replace(/^(the|a|an)\s+/, "");
+  return s || t;
+}
+function letterOf(f) {
+  const c = sortKey(f).charAt(0);
+  return /[a-z]/.test(c) ? c.toUpperCase() : "#";
+}
+function sortFilms(list) {
+  const arr = list.slice();
+  const byTitle = (a, b) => collator.compare(sortKey(a), sortKey(b));
+  if (sortMode === "new") arr.sort((a, b) => b.created - a.created || byTitle(a, b));
+  else if (sortMode === "old") arr.sort((a, b) => a.created - b.created || byTitle(a, b));
+  else if (sortMode === "year") arr.sort((a, b) => (b.releaseDate || "").localeCompare(a.releaseDate || "") || byTitle(a, b));
+  else if (sortMode === "rating") arr.sort((a, b) => avgRating(b) - avgRating(a) || byTitle(a, b));
+  else arr.sort(byTitle);
+  return arr;
+}
+
+function yearOf(f) { return /^\d{4}/.test(f.releaseDate) ? f.releaseDate.slice(0, 4) : ""; }
+function decadeOf(f) { const y = yearOf(f); return y ? Math.floor(Number(y) / 10) * 10 + "s" : ""; }
+function formatDate(s) {
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s);
+  if (!m) return s;
+  return new Date(Date.UTC(+m[1], +m[2] - 1, +m[3])).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" });
+}
+function avgRating(f) {
+  const v = [f.ratings.tim, f.ratings.siobhan].filter((n) => n > 0);
+  return v.length ? v.reduce((a, b) => a + b, 0) / v.length : 0;
+}
+function seenSet(f, i) {
+  const count = f.seasons[i] || 0;
+  return new Set((f.seen["s" + (i + 1)] || []).filter((e) => e <= count));
+}
+function seenCount(f) { return f.seasons.reduce((a, _, i) => a + seenSet(f, i).size, 0); }
+function episodeTotal(f) { return f.seasons.reduce((a, b) => a + b, 0); }
+function isComplete(f) { return f.seasons.length > 0 && seenCount(f) === episodeTotal(f); }
+function watchedTime(f) {
+  if (f.watchedAt) return f.watchedAt;
+  const t = f.plannedDate ? Date.parse(f.plannedDate + "T12:00:00") : NaN;
+  return Number.isFinite(t) ? t : f.created;
+}
+function todayStr() {
+  const d = new Date();
+  return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+}
+
+/* ---------- Stores ---------- */
+function applyPatch(obj, patch) {
+  const out = JSON.parse(JSON.stringify(obj));
+  Object.keys(patch).forEach((k) => {
+    const parts = k.split(".");
+    let t = out;
+    for (let i = 0; i < parts.length - 1; i++) {
+      if (typeof t[parts[i]] !== "object" || t[parts[i]] === null) t[parts[i]] = {};
+      t = t[parts[i]];
+    }
+    t[parts[parts.length - 1]] = patch[k];
+  });
+  return out;
+}
+
+function makeLocalStore() {
+  let items = [];
+  let onChange = () => {};
+  try {
+    const raw = JSON.parse(localStorage.getItem(LOCAL_KEY) || "[]");
+    if (Array.isArray(raw)) items = raw.map((d, i) => cleanFilm(d.id || "l" + i, d));
+  } catch (e) { items = []; }
+
+  function commit() {
+    try { localStorage.setItem(LOCAL_KEY, JSON.stringify(items)); } catch (e) { saveFailed(); }
+    onChange(items.slice());
+  }
+  return {
+    shared: false,
+    subscribe(cb) { onChange = cb; cb(items.slice()); },
+    add(f) {
+      items.push(cleanFilm("l" + Date.now().toString(36) + Math.random().toString(36).slice(2, 7), f));
+      commit();
+      return Promise.resolve();
+    },
+    update(id, patch) {
+      items = items.map((x) => (x.id === id ? cleanFilm(id, applyPatch(x, patch)) : x));
+      commit();
+      return Promise.resolve();
+    },
+    remove(id) {
+      items = items.filter((x) => x.id !== id);
+      commit();
+      return Promise.resolve();
+    },
+    getProfile() { return Promise.resolve({ who: "tim" }); },
+    setProfile() { return Promise.resolve(); },
+    getConfig() { return Promise.resolve(null); }
+  };
+}
+
+async function makeFirebaseStore() {
+  const base = "https://www.gstatic.com/firebasejs/" + FIREBASE_VERSION;
+  const [appMod, authMod, fsMod] = await Promise.all([
+    import(base + "/firebase-app.js"),
+    import(base + "/firebase-auth.js"),
+    import(base + "/firebase-firestore.js")
+  ]);
+  const app = appMod.initializeApp(FIREBASE_CONFIG);
+  const auth = authMod.getAuth(app);
+  const db = fsMod.getFirestore(app);
+  const col = fsMod.collection(db, COLLECTION);
+  let unsub = null;
+
+  return {
+    shared: true,
+    auth: {
+      onChange(cb) { authMod.onAuthStateChanged(auth, cb); },
+      signIn(email, pw) { return authMod.signInWithEmailAndPassword(auth, email, pw); },
+      signOut() { return authMod.signOut(auth); }
+    },
+    subscribe(cb, onError) {
+      this.unsubscribe();
+      unsub = fsMod.onSnapshot(
+        fsMod.query(col, fsMod.orderBy("created")),
+        (snap) => cb(snap.docs.map((d) => cleanFilm(d.id, d.data()))),
+        onError
+      );
+    },
+    unsubscribe() { if (unsub) { unsub(); unsub = null; } },
+    add(f) { return fsMod.addDoc(col, f); },
+    update(id, patch) { return fsMod.updateDoc(fsMod.doc(db, COLLECTION, id), patch); },
+    remove(id) { return fsMod.deleteDoc(fsMod.doc(db, COLLECTION, id)); },
+    async getProfile(uid) {
+      const s = await fsMod.getDoc(fsMod.doc(db, "profiles", uid));
+      return s.exists() ? s.data() : null;
+    },
+    setProfile(uid, data) { return fsMod.setDoc(fsMod.doc(db, "profiles", uid), data); },
+    async getConfig() {
+      const s = await fsMod.getDoc(fsMod.doc(db, "config", "app"));
+      return s.exists() ? s.data() : null;
+    }
+  };
+}
+
+/* ---------- TMDB lookups ---------- */
+async function tmdbGet(path, params) {
+  const u = new URL("https://api.themoviedb.org/3" + path);
+  u.searchParams.set("api_key", tmdbKey);
+  u.searchParams.set("language", "en-GB");
+  Object.keys(params || {}).forEach((k) => u.searchParams.set(k, params[k]));
+  const res = await fetch(u.toString());
+  if (!res.ok) throw new Error("TMDB " + res.status);
+  return res.json();
+}
+
+async function tmdbSearch(q, kind) {
+  const path = kind === "movie" ? "/search/movie" : kind === "series" ? "/search/tv" : "/search/multi";
+  const data = await tmdbGet(path, { query: q, include_adult: "false" });
+  return (data.results || [])
+    .filter((r) => kind || r.media_type === "movie" || r.media_type === "tv")
+    .slice(0, 6)
+    .map((r) => {
+      const tv = kind ? kind === "series" : r.media_type === "tv";
+      return {
+        id: r.id,
+        kind: tv ? "series" : "movie",
+        title: (tv ? r.name : r.title) || "",
+        releaseDate: (tv ? r.first_air_date : r.release_date) || "",
+        poster: r.poster_path || "",
+        overview: r.overview || ""
+      };
+    });
+}
+
+async function tmdbDetails(kind, id) {
+  const tv = kind === "series";
+  const d = await tmdbGet("/" + (tv ? "tv" : "movie") + "/" + id, { append_to_response: "credits" });
+  return {
+    tmdbId: d.id,
+    kind: kind,
+    title: (tv ? d.name : d.title) || "",
+    releaseDate: (tv ? d.first_air_date : d.release_date) || "",
+    genres: (d.genres || []).map((g) => g.name).slice(0, 5),
+    cast: ((d.credits && d.credits.cast) || []).slice(0, 8).map((c) => c.name),
+    overview: d.overview || "",
+    poster: d.poster_path || "",
+    runtime: tv ? 0 : d.runtime || 0,
+    seasons: tv ? (d.seasons || []).filter((s) => s.season_number > 0 && s.episode_count > 0).map((s) => s.episode_count) : []
+  };
+}
+
+function fromResult(r) {
+  return { tmdbId: r.id, kind: r.kind, title: r.title, releaseDate: r.releaseDate, genres: [], cast: [], overview: r.overview, poster: r.poster, runtime: 0, seasons: [] };
+}
+
+/* ---------- Titles and progress ---------- */
+function updateTitle() {
+  const t = NAMES[otherKey(me)] + " & " + NAMES[me] + "'s film and TV list";
+  els.pageTitle.textContent = t;
+  document.title = t;
+}
+
+/* ---------- Filters ---------- */
+function passes(f) {
+  if (filt.status === "watched" && !f.watched) return false;
+  if (filt.status === "todo" && f.watched) return false;
+  if (filt.kind && f.kind !== filt.kind) return false;
+  if (filt.q && f.title.toLowerCase().indexOf(filt.q.toLowerCase()) < 0) return false;
+  if (filt.genre && f.genres.indexOf(filt.genre) < 0) return false;
+  if (filt.decade && decadeOf(f) !== filt.decade) return false;
+  if (filt.actor) {
+    const a = filt.actor.toLowerCase();
+    if (!f.cast.some((c) => c.toLowerCase().indexOf(a) >= 0)) return false;
+  }
+  if (filt.rating && avgRating(f) < filt.rating) return false;
+  return true;
+}
+function detailFilterCount() {
+  return ["q", "kind", "genre", "decade", "actor"].filter((k) => filt[k]).length + (filt.rating ? 1 : 0);
+}
+
+let optSig = "";
+function syncFilterOptions() {
+  const genres = new Set();
+  const decades = new Set();
+  const actors = {};
+  films.forEach((f) => {
+    f.genres.forEach((g) => genres.add(g));
+    const d = decadeOf(f);
+    if (d) decades.add(d);
+    f.cast.forEach((c) => { actors[c] = (actors[c] || 0) + 1; });
+  });
+  const gList = Array.from(genres).sort();
+  const dList = Array.from(decades).sort().reverse();
+  const aList = Object.keys(actors).sort((a, b) => actors[b] - actors[a] || a.localeCompare(b)).slice(0, 300);
+  const sig = JSON.stringify([gList, dList, aList]);
+  if (sig === optSig) return;
+  optSig = sig;
+  els.fGenre.innerHTML = '<option value="">Any</option>' + gList.map((g) => '<option value="' + esc(g) + '">' + esc(g) + "</option>").join("");
+  els.fDecade.innerHTML = '<option value="">Any</option>' + dList.map((d) => '<option value="' + d + '">' + d + "</option>").join("");
+  els.actorList.innerHTML = aList.map((a) => '<option value="' + esc(a) + '"></option>').join("");
+  if (gList.indexOf(filt.genre) < 0) filt.genre = "";
+  if (dList.indexOf(filt.decade) < 0) filt.decade = "";
+  els.fGenre.value = filt.genre;
+  els.fDecade.value = filt.decade;
+}
+
+/* ---------- Row markup ---------- */
+function heartsStatic(n) {
+  let s = "";
+  for (let i = 1; i <= 5; i++) s += '<svg viewBox="0 0 24 24" class="' + (i <= n ? "on" : "") + '" aria-hidden="true" focusable="false"><path d="' + HEART_PATH + '"/></svg>';
+  return s;
+}
+
+const CHEV = '<svg class="chev" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
+function rowAHTML(f) {
+  const compact = density === "compact";
+  const open = expanded.has(f.id);
+  const w = compact ? 34 : 46;
+  const h = compact ? 51 : 69;
+  const thumb = f.poster
+    ? '<img class="thumb" src="' + IMG + "w92" + esc(f.poster) + '" alt="" loading="lazy" width="' + w + '" height="' + h + '">'
+    : '<span class="thumb ph" aria-hidden="true">' + esc(letterOf(f)) + "</span>";
+  const avg = avgRating(f);
+  let sub = '<span class="badge">' + (f.kind === "series" ? "Series" : "Film") + "</span>";
+  const y = yearOf(f);
+  if (y) sub += "<span>" + y + "</span>";
+  if (f.watched && avg) sub += '<span class="avgchip" role="img" aria-label="Average rating ' + fmt1(avg) + ' out of 5">' + fmt1(avg) + "</span>";
+  let prog = "";
+  if (f.kind === "series" && f.seasons.length) {
+    const s = seenCount(f);
+    if (s > 0 || !f.watched) {
+      prog = compact
+        ? "<span>" + s + "/" + episodeTotal(f) + " eps</span>"
+        : '<div class="prog">' + s + " of " + episodeTotal(f) + " episodes watched</div>";
+    }
+  }
+  if (compact) sub += prog;
+  const text = '<div class="txt"><div class="title">' + esc(f.title) + '</div><div class="sub">' + sub + "</div>" + (compact ? "" : prog) + "</div>";
+  const main = compact
+    ? '<button type="button" class="main" data-action="toggle" data-fk="main" aria-expanded="' + open + '">' + thumb + text + CHEV + "</button>"
+    : '<div class="main">' + thumb + text + "</div>";
+  const del = compact ? "" : '<button type="button" class="del" data-action="del" data-fk="del" aria-label="Remove ' + esc(f.title) + '">&times;</button>';
+  return '<button type="button" class="tick" data-action="tick" data-fk="tick" aria-pressed="' + f.watched + '" aria-label="Watched: ' + esc(f.title) + '">' + heartSvg + "</button>" + main + del;
+}
+
+function rowRatingHTML(f) {
+  if (!f.watched) return "";
+  const r = f.ratings[me];
+  let h = '<div class="rating" role="group" aria-label="Your rating"><span aria-hidden="true">Your rating</span>';
+  for (let n = 1; n <= 5; n++) {
+    h += '<button type="button" class="rate' + (n <= r ? " on" : "") + '" data-action="rate" data-n="' + n + '" data-fk="rate' + n + '" aria-pressed="' + (n === r) + '" aria-label="Rate ' + n + ' out of 5">' + heartSvg + "</button>";
+  }
+  return h + "</div>";
+}
+
+function matchHTML(f) {
+  if (matchState.id !== f.id) return "";
+  let h = '<div class="match"><div class="matchsearch"><input type="search" class="matchq" value="' + esc(matchState.q) + '" aria-label="Search for details" data-fk="mq">' +
+    '<button type="button" class="chip-btn" data-action="match-search" data-fk="ms">Search</button></div>';
+  if (matchState.loading) h += '<p class="fact dim">Searching...</p>';
+  else if (matchState.error) h += '<p class="fact dim">' + esc(matchState.error) + "</p>";
+  else {
+    h += '<ul class="suggest">' + matchState.results.map((r, i) =>
+      '<li><button type="button" data-action="pick" data-i="' + i + '" data-fk="pick' + i + '">' + resultInner(r) + "</button></li>").join("") + "</ul>";
+  }
+  return h + '<button type="button" class="link" data-action="match-close" data-fk="mc">Close</button></div>';
+}
+
+function detailsHTML(f) {
+  const isSeries = f.kind === "series";
+  let h = '<div class="details">';
+  if (f.poster || f.genres.length || f.releaseDate || f.cast.length) {
+    h += '<div class="info">';
+    if (f.poster) h += '<img class="poster" src="' + IMG + "w185" + esc(f.poster) + '" alt="Poster for ' + esc(f.title) + '" width="92" height="138" loading="lazy">';
+    h += '<div class="facts">';
+    if (f.genres.length) h += '<div class="chips">' + f.genres.map((g) => '<span class="chip">' + esc(g) + "</span>").join("") + "</div>";
+    if (f.releaseDate) h += '<p class="fact"><b>Released</b>' + esc(formatDate(f.releaseDate)) + "</p>";
+    if (f.runtime) h += '<p class="fact"><b>Runtime</b>' + Math.floor(f.runtime / 60) + "h " + (f.runtime % 60) + "m</p>";
+    if (f.cast.length) h += '<p class="fact"><b>Starring</b>' + esc(f.cast.slice(0, 5).join(", ")) + "</p>";
+    h += "</div></div>";
+  }
+  if (f.overview) h += '<p class="overview">' + esc(f.overview) + "</p>";
+
+  if (f.watched) {
+    const avg = avgRating(f);
+    h += '<div><h4>Ratings</h4>';
+    ["tim", "siobhan"].forEach((k) => {
+      const v = f.ratings[k];
+      h += '<div class="rline"><span>' + NAMES[k] + "</span>" + (v > 0
+        ? '<span class="hearts" role="img" aria-label="' + NAMES[k] + " rated " + v + ' out of 5">' + heartsStatic(v) + "</span>"
+        : '<span class="dim">Not rated yet</span>') + "</div>";
+    });
+    if (avg) h += '<div class="rline"><span>Average</span><span class="avgchip">' + fmt1(avg) + " out of 5</span></div>";
+    h += "</div>";
+  }
+
+  if (isSeries && f.seasons.length) {
+    h += '<div class="seasons"><h4>Seasons</h4>';
+    f.seasons.forEach((count, i) => {
+      const n = i + 1;
+      const set = seenSet(f, i);
+      const sid = f.id + ":" + n;
+      h += '<details class="season" data-sid="' + esc(sid) + '"' + (openSeasons.has(sid) ? " open" : "") + '><summary data-fk="sum' + n + '">Season ' + n + '<span class="count">' + set.size + " of " + count + "</span></summary><div class=\"eps\">";
+      for (let e = 1; e <= count; e++) {
+        h += '<button type="button" class="ep' + (set.has(e) ? " on" : "") + '" data-action="ep" data-s="' + n + '" data-e="' + e + '" data-fk="ep' + n + "-" + e + '" aria-pressed="' + set.has(e) + '" aria-label="Season ' + n + " episode " + e + '">' + e + "</button>";
+      }
+      h += '</div><button type="button" class="link" data-action="season-all" data-s="' + n + '" data-fk="all' + n + '">' + (set.size === count ? "Clear season" : "Mark season watched") + "</button></details>";
+    });
+    h += "</div>";
+  } else if (isSeries) {
+    h += '<p class="fact dim">Episode tracking appears once details are found for this series.</p>';
+  }
+
+  h += '<div class="actions">';
+  if (!f.tmdbId) {
+    h += '<span class="typesw" role="group" aria-label="Type"><button type="button" class="chip-btn" data-action="kind" data-kind="movie" data-fk="km" aria-pressed="' + (f.kind === "movie") + '">Film</button>' +
+      '<button type="button" class="chip-btn" data-action="kind" data-kind="series" data-fk="ks" aria-pressed="' + (f.kind === "series") + '">Series</button></span>';
+  }
+  if (tmdbKey) h += '<button type="button" class="link" data-action="' + (f.tmdbId ? "refresh" : "lookup") + '" data-fk="lookup">' + (f.tmdbId ? "Refresh details" : "Find details") + "</button>";
+  if (density === "compact") h += '<button type="button" class="link" data-action="del" data-fk="rm" aria-label="Remove ' + esc(f.title) + ' from the list">Remove from list</button>';
+  h += "</div>" + matchHTML(f) + "</div>";
+  return h;
+}
+
+function rowBHTML(f) {
+  const open = expanded.has(f.id);
+  if (density === "compact") return open ? detailsHTML(f) : "";
+  return '<button type="button" class="more" data-action="toggle" data-fk="toggle" aria-expanded="' + open + '">' + (open ? "Hide details" : "Details") + "</button>" + (open ? detailsHTML(f) : "");
+}
+
+function resultInner(r) {
+  const y = /^\d{4}/.test(r.releaseDate) ? r.releaseDate.slice(0, 4) : "";
+  return (r.poster ? '<img src="' + IMG + "w92" + esc(r.poster) + '" alt="" width="34" height="51">' : '<span class="noimg"></span>') +
+    '<span><span class="s-title">' + esc(r.title) + '</span><br><span class="s-sub">' + (r.kind === "series" ? "Series" : "Film") + (y ? ", " + y : "") + "</span></span>";
+}
+
+/* ---------- Row lifecycle ---------- */
+function createRow(id) {
+  const li = document.createElement("li");
+  li.className = "film";
+  li.dataset.id = id;
+  li.innerHTML =
+    '<div class="dyn" data-slot="a"></div>' +
+    '<div class="meta"><label class="date"><span>Watching on</span><input type="date"></label><div class="dyn" data-slot="r"></div></div>' +
+    '<div class="dyn" data-slot="b"></div>';
+  li._watched = null;
+  li._sig = "";
+  return li;
+}
+
+function updateRow(li, f) {
+  const sig = JSON.stringify([f, expanded.has(f.id), me, tmdbKey ? 1 : 0, density, matchState.id === f.id ? matchState : 0]);
+  const dateInput = li.querySelector('input[type="date"]');
+  if (dateInput.value !== f.plannedDate && document.activeElement !== dateInput) dateInput.value = f.plannedDate;
+  if (li._sig === sig) return;
+
+  const active = document.activeElement;
+  const fk = active && li.contains(active) ? active.dataset.fk : null;
+  const prev = li._watched;
+
+  li.classList.toggle("watched", f.watched);
+  li.classList.toggle("compact", density === "compact");
+  li.classList.toggle("open", expanded.has(f.id));
+  li.querySelector('[data-slot="a"]').innerHTML = rowAHTML(f);
+  li.querySelector('[data-slot="r"]').innerHTML = rowRatingHTML(f);
+  li.querySelector('[data-slot="b"]').innerHTML = rowBHTML(f);
+  li._sig = sig;
+  li._watched = f.watched;
+
+  if (prev === false && f.watched && !reduceMotion()) li.querySelector(".tick").classList.add("pop");
+  if (fk && fk !== "mq") {
+    const el = li.querySelector('[data-fk="' + fk + '"]');
+    if (el) el.focus();
+  }
+}
+
+/* ---------- Letter headers and A to Z rail ---------- */
+const heads = new Map();
+function headEl(L) {
+  let el = heads.get(L);
+  if (!el) {
+    el = document.createElement("li");
+    el.className = "letter";
+    el.setAttribute("aria-hidden", "true");
+    el.dataset.letter = L;
+    el.textContent = L;
+    heads.set(L, el);
+  }
+  return el;
+}
+
+const RAIL = ["#"].concat("ABCDEFGHIJKLMNOPQRSTUVWXYZ".split(""));
+let railSig = "";
+let railPresent = new Set();
+function updateRail(letters, show) {
+  els.rail.hidden = !show;
+  document.body.classList.toggle("has-rail", !!show);
+  if (!show) return;
+  railPresent = new Set(letters);
+  const sig = letters.join("");
+  if (sig === railSig) return;
+  railSig = sig;
+  els.rail.innerHTML = RAIL.map((l) => '<span class="' + (railPresent.has(l) ? "has" : "") + '">' + l + "</span>").join("");
+}
+
+let bubbleTimer = null;
+let lastRail = "";
+let railDrag = false;
+function showBubble(L) {
+  els.bubble.textContent = L;
+  els.bubble.hidden = false;
+  clearTimeout(bubbleTimer);
+  bubbleTimer = setTimeout(() => { els.bubble.hidden = true; }, 700);
+}
+function jumpTo(L) {
+  const i = RAIL.indexOf(L);
+  let target = "";
+  for (let j = i; j < RAIL.length; j++) if (railPresent.has(RAIL[j])) { target = RAIL[j]; break; }
+  if (!target) for (let j = i; j >= 0; j--) if (railPresent.has(RAIL[j])) { target = RAIL[j]; break; }
+  if (!target) return;
+  showBubble(target);
+  if (target === lastRail) return;
+  lastRail = target;
+  const head = els.list.querySelector('.letter[data-letter="' + target + '"]');
+  const row = head && head.nextElementSibling;
+  if (row) window.scrollTo(0, row.getBoundingClientRect().top + window.scrollY - 40);
+}
+function railLetterAt(y) {
+  const r = els.rail.getBoundingClientRect();
+  const idx = Math.max(0, Math.min(RAIL.length - 1, Math.floor(((y - r.top) / (r.height || 1)) * RAIL.length)));
+  return RAIL[idx];
+}
+els.rail.addEventListener("pointerdown", (e) => {
+  e.preventDefault();
+  try { els.rail.setPointerCapture(e.pointerId); } catch (err) { /* ignore */ }
+  railDrag = true;
+  lastRail = "";
+  jumpTo(railLetterAt(e.clientY));
+});
+els.rail.addEventListener("pointermove", (e) => { if (railDrag) jumpTo(railLetterAt(e.clientY)); });
+["pointerup", "pointercancel"].forEach((t) => els.rail.addEventListener(t, () => { railDrag = false; }));
+
+/* ---------- Render ---------- */
+function render() {
+  const total = films.length;
+  const watched = films.filter((f) => f.watched).length;
+  els.progressText.textContent = total ? watched + " of " + total + " watched together" : "Films and series to watch together";
+  const pct = total ? (watched / total) * 100 : 0;
+  els.barFill.style.width = pct + "%";
+  els.bar.setAttribute("aria-valuenow", String(Math.round(pct)));
+
+  els.credit.hidden = !tmdbKey;
+  els.signOut.hidden = !(store && store.shared);
+
+  document.querySelectorAll("[data-view]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.view === view)));
+  els.listView.hidden = view !== "list";
+  els.statsView.hidden = view !== "stats";
+  if (view === "stats") {
+    els.statsView.innerHTML = statsHTML();
+    updateRail([], false);
+    return;
+  }
+
+  syncFilterOptions();
+  document.querySelectorAll("[data-filter]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.filter === filt.status)));
+  document.querySelectorAll("[data-density]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.density === density)));
+  els.sortSel.value = sortMode;
+  const fc = detailFilterCount();
+  els.moreBtn.textContent = fc ? "Filters (" + fc + ")" : "Filters";
+  els.moreBtn.setAttribute("aria-pressed", String(fc > 0));
+
+  const visible = sortFilms(films.filter(passes));
+  const nodes = [];
+  const letters = [];
+  const usedRows = new Set();
+  let cur = null;
+  visible.forEach((f) => {
+    if (sortMode === "az") {
+      const L = letterOf(f);
+      if (L !== cur) { cur = L; letters.push(L); nodes.push(headEl(L)); }
+    }
+    let el = rows.get(f.id);
+    if (!el) { el = createRow(f.id); rows.set(f.id, el); }
+    updateRow(el, f);
+    usedRows.add(f.id);
+    nodes.push(el);
+  });
+  rows.forEach((el, id) => { if (!usedRows.has(id)) rows.delete(id); });
+  heads.forEach((el, L) => { if (letters.indexOf(L) < 0) heads.delete(L); });
+  const keep = new Set(nodes);
+  Array.from(els.list.children).forEach((c) => { if (!keep.has(c)) c.remove(); });
+  nodes.forEach((n, i) => {
+    if (els.list.children[i] !== n) els.list.insertBefore(n, els.list.children[i] || null);
+  });
+  updateRail(letters, sortMode === "az" && visible.length >= 6);
+
+  let msg = "";
+  if (!total) msg = "No films or series yet. Add the first one above.";
+  else if (!visible.length) {
+    if (fc) msg = "Nothing matches those filters.";
+    else msg = filt.status === "watched" ? "No watched films or series yet." : "You've watched everything on the list.";
+  }
+  els.empty.textContent = msg;
+  els.empty.hidden = !msg;
+}
+
+/* ---------- Stats ---------- */
+function tally(list, keysOf, valueOf) {
+  const out = {};
+  list.forEach((f) => keysOf(f).forEach((k) => {
+    const o = out[k] || (out[k] = { n: 0, sum: 0, rated: 0 });
+    o.n++;
+    const v = valueOf ? valueOf(f) : 0;
+    if (v > 0) { o.sum += v; o.rated++; }
+  }));
+  return out;
+}
+function barRows(items, max) {
+  if (!items.length) return "";
+  const m = max || Math.max.apply(null, items.map((i) => i.value)) || 1;
+  return items.map((i) =>
+    '<div class="brow"><span>' + esc(i.label) + '</span><span class="btrack"><span class="bfill" style="width:' + Math.round((i.value / m) * 100) + '%"></span></span><span class="bval">' + esc(i.text) + "</span></div>").join("");
+}
+const sec = (title, body) => '<div class="sec"><h3>' + title + "</h3>" + body + "</div>";
+const plural = (n, one, many) => n + " " + (n === 1 ? one : many);
+
+function statsHTML() {
+  const W = films.filter((f) => f.watched);
+  const T = films.filter((f) => !f.watched);
+  const eps = films.reduce((a, f) => a + (f.kind === "series" ? seenCount(f) : 0), 0);
+  let h = "<h2>Watched together</h2>";
+  h += '<div class="tiles"><div class="tile"><b>' + W.length + "</b><span>Watched</span></div><div class=\"tile\"><b>" + T.length + "</b><span>To watch</span></div><div class=\"tile\"><b>" + eps + "</b><span>Episodes seen</span></div></div>";
+
+  // Timeline
+  const months = [];
+  const now = new Date();
+  for (let i = 11; i >= 0; i--) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    months.push({ key: d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0"), label: d.toLocaleDateString("en-GB", { month: "short" }), n: 0 });
+  }
+  W.forEach((f) => {
+    const t = new Date(watchedTime(f));
+    const key = t.getFullYear() + "-" + String(t.getMonth() + 1).padStart(2, "0");
+    const m = months.find((x) => x.key === key);
+    if (m) m.n++;
+  });
+  const mmax = Math.max.apply(null, months.map((m) => m.n).concat([1]));
+  const last12 = months.reduce((a, m) => a + m.n, 0);
+  if (W.length) {
+    h += sec("Watched over the last 12 months",
+      '<div class="months" role="img" aria-label="' + esc(months.map((m) => m.label + " " + m.n).join(", ")) + '">' +
+      months.map((m) => '<div class="mcol"><span class="mnum">' + (m.n || "") + '</span><span class="mbar" style="height:' + Math.round((m.n / mmax) * 90) + 'px"></span><span class="mlabel">' + m.label + "</span></div>").join("") +
+      '</div><p class="note">' + plural(last12, "title", "titles") + " in the last 12 months, " + W.length + " in total. Titles ticked before the date tracking existed use the date they were added or planned.</p>");
+  }
+
+  // Genres
+  const g = tally(W, (f) => f.genres, avgRating);
+  const gNames = Object.keys(g);
+  if (gNames.length) {
+    const most = gNames.sort((a, b) => g[b].n - g[a].n || a.localeCompare(b)).slice(0, 8).map((n) => ({ label: n, value: g[n].n, text: plural(g[n].n, "title", "titles") }));
+    h += sec("Most watched genres", barRows(most));
+    const best = Object.keys(g).filter((n) => g[n].rated > 0)
+      .sort((a, b) => g[b].sum / g[b].rated - g[a].sum / g[a].rated || g[b].n - g[a].n)
+      .slice(0, 6).map((n) => ({ label: n, value: g[n].sum / g[n].rated, text: fmt1(g[n].sum / g[n].rated) + " (" + g[n].rated + ")" }));
+    if (best.length) h += sec("Highest rated genres", barRows(best, 5) + '<p class="note">Average rating out of 5, with how many rated titles in brackets.</p>');
+  }
+
+  // Each of you
+  const person = (k) => {
+    const rated = W.filter((f) => f.ratings[k] > 0);
+    let b = "<h3>" + NAMES[k] + "</h3>";
+    if (!rated.length) return '<div class="sec">' + b + '<p class="note" style="margin:0">No ratings yet.</p></div>';
+    const mean = rated.reduce((a, f) => a + f.ratings[k], 0) / rated.length;
+    const top = rated.slice().sort((a, c) => c.ratings[k] - a.ratings[k] || a.title.localeCompare(c.title)).slice(0, 5);
+    const pg = tally(rated, (f) => f.genres, (f) => f.ratings[k]);
+    const fav = Object.keys(pg).filter((n) => pg[n].n >= 2).sort((a, c) => pg[c].sum / pg[c].rated - pg[a].sum / pg[a].rated || pg[c].n - pg[a].n).slice(0, 3);
+    b += '<p class="note" style="margin:0 0 8px">Rated ' + rated.length + ", average " + fmt1(mean) + '</p><ul class="rank">' +
+      top.map((f) => "<li><span>" + esc(f.title) + "</span><span>" + f.ratings[k] + " of 5</span></li>").join("") + "</ul>";
+    if (fav.length) b += '<p class="note">Favourite genres: ' + fav.map(esc).join(", ") + "</p>";
+    return '<div class="sec">' + b + "</div>";
+  };
+  if (W.some((f) => f.ratings.tim > 0 || f.ratings.siobhan > 0)) {
+    h += '<div class="duo">' + person("tim") + person("siobhan") + "</div>";
+    const both = W.filter((f) => f.ratings.tim > 0 && f.ratings.siobhan > 0);
+    if (both.length >= 2) {
+      const diff = both.reduce((a, f) => a + Math.abs(f.ratings.tim - f.ratings.siobhan), 0) / both.length;
+      h += '<p class="note" style="margin:8px 0 12px">Across ' + both.length + " titles you have both rated, you are on average " + fmt1(diff) + " hearts apart.</p>";
+    }
+  }
+
+  // Joint favourites
+  const joint = W.filter((f) => f.ratings.tim >= 4 && f.ratings.siobhan >= 4)
+    .sort((a, b) => avgRating(b) - avgRating(a) || a.title.localeCompare(b.title)).slice(0, 8);
+  h += sec("Joint favourites", joint.length
+    ? '<ul class="rank">' + joint.map((f) => "<li><span>" + esc(f.title) + "</span><span>Tim " + f.ratings.tim + ", Siobhan " + f.ratings.siobhan + "</span></li>").join("") + "</ul>"
+    : '<p class="note" style="margin:0">Titles you have both rated 4 or more will show here.</p>');
+
+  // Actors
+  const a = tally(W, (f) => f.cast, avgRating);
+  const actors = Object.keys(a).filter((n) => a[n].n >= 2)
+    .sort((x, y) => a[y].n - a[x].n || (a[y].rated ? a[y].sum / a[y].rated : 0) - (a[x].rated ? a[x].sum / a[x].rated : 0) || x.localeCompare(y)).slice(0, 8);
+  h += sec("Favourite actors", actors.length
+    ? '<ul class="rank">' + actors.map((n) => "<li><span>" + esc(n) + "</span><span>" + plural(a[n].n, "title", "titles") + (a[n].rated ? ", avg " + fmt1(a[n].sum / a[n].rated) : "") + "</span></li>").join("") + "</ul>"
+    : '<p class="note" style="margin:0">Actors who appear in two or more watched titles will show here.</p>');
+
+  // To watch
+  h += "<h2>Still to watch</h2>";
+  const films2 = T.filter((f) => f.kind === "movie").length;
+  const series2 = T.length - films2;
+  const started = T.filter((f) => f.kind === "series" && seenCount(f) > 0).length;
+  h += sec("On the list", '<p style="margin:0">' + plural(T.length, "title", "titles") + ": " + plural(films2, "film", "films") + " and " + plural(series2, "series", "series") +
+    (started ? ", " + started + " already started" : "") + ".</p>");
+  const tg = tally(T, (f) => f.genres);
+  const tgItems = Object.keys(tg).sort((x, y) => tg[y].n - tg[x].n || x.localeCompare(y)).slice(0, 8).map((n) => ({ label: n, value: tg[n].n, text: String(tg[n].n) }));
+  if (tgItems.length) h += sec("By genre", barRows(tgItems));
+  const td = tally(T, (f) => (decadeOf(f) ? [decadeOf(f)] : []));
+  const tdItems = Object.keys(td).sort().reverse().map((n) => ({ label: n, value: td[n].n, text: String(td[n].n) }));
+  if (tdItems.length) h += sec("By decade", barRows(tdItems));
+  const today = todayStr();
+  const soon = T.filter((f) => f.plannedDate && f.plannedDate >= today).sort((x, y) => x.plannedDate.localeCompare(y.plannedDate)).slice(0, 5);
+  if (soon.length) h += sec("Coming up", '<ul class="rank">' + soon.map((f) => "<li><span>" + esc(f.title) + "</span><span>" + esc(formatDate(f.plannedDate)) + "</span></li>").join("") + "</ul>");
+  const waiting = T.filter((f) => f.created).sort((x, y) => x.created - y.created).slice(0, 3);
+  if (waiting.length) h += sec("Waiting longest", '<ul class="rank">' + waiting.map((f) => "<li><span>" + esc(f.title) + "</span><span>" + plural(Math.max(0, Math.floor((Date.now() - f.created) / 864e5)), "day", "days") + "</span></li>").join("") + "</ul>");
+  return h;
+}
+
+/* ---------- Milestones ---------- */
+let toastTimer = null;
+function showToast(text) {
+  els.toast.textContent = text;
+  els.toast.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => els.toast.classList.remove("show"), reduceMotion() ? 2500 : 4000);
+}
+function floatHeart() {
+  if (typeof Element.prototype.animate !== "function") return;
+  const h = document.createElement("div");
+  h.className = "floaty";
+  h.innerHTML = heartSvg;
+  h.style.top = (15 + Math.random() * 65) + "vh";
+  document.body.appendChild(h);
+  const anim = h.animate(
+    [{ transform: "translateX(-60px)" }, { transform: "translateX(" + (window.innerWidth + 60) + "px)" }],
+    { duration: 6000, easing: "linear" }
+  );
+  anim.onfinish = () => h.remove();
+}
+function celebrate(count) {
+  showToast(count === 1 ? "First film or series watched together" : count + " watched together");
+  if (!reduceMotion()) floatHeart();
+}
+
+/* ---------- Actions ---------- */
+function setWatched(f, val, extra) {
+  const patch = Object.assign({ watched: val, watchedAt: val ? Date.now() : 0 }, extra || {});
+  if (val && !f.watched) {
+    const count = films.filter((x) => x.watched).length + 1;
+    if (count === 1 || count % 5 === 0) celebrate(count);
+  }
+  run(store.update(f.id, patch));
+}
+
+function applySeen(f, key, arr) {
+  const seen = Object.assign({}, f.seen);
+  seen[key] = arr;
+  const was = isComplete(f);
+  const now = isComplete(Object.assign({}, f, { seen: seen }));
+  const patch = {};
+  patch["seen." + key] = arr;
+  if (now && !f.watched) { setWatched(f, true, patch); return; }
+  if (!now && was && f.watched) { patch.watched = false; patch.watchedAt = 0; }
+  run(store.update(f.id, patch));
+}
+
+async function applyDetails(f, kind, tmdbId, fallback) {
+  setStatus("Getting details...", false);
+  let d;
+  try { d = await tmdbDetails(kind, tmdbId); }
+  catch (e) { if (!fallback) { setStatus("Couldn't get details right now. Try again.", true); return; } d = fallback; }
+  run(store.update(f.id, {
+    tmdbId: d.tmdbId, kind: d.kind, releaseDate: d.releaseDate, genres: d.genres, cast: d.cast,
+    overview: d.overview, poster: d.poster, runtime: d.runtime, seasons: d.seasons
+  }));
+}
+
+async function runMatchSearch(id, q) {
+  matchState = { id: id, loading: true, results: [], error: "", q: q };
+  render();
+  try {
+    const results = await tmdbSearch(q);
+    if (matchState.id !== id) return;
+    matchState = { id: id, loading: false, results: results, error: results.length ? "" : "No matches found. Try a different search.", q: q };
+  } catch (e) {
+    if (matchState.id !== id) return;
+    matchState = { id: id, loading: false, results: [], error: "Couldn't reach the lookup service. Try again.", q: q };
+  }
+  render();
+}
+
+els.list.addEventListener("click", (e) => {
+  const btn = e.target.closest("[data-action]");
+  if (!btn) return;
+  const li = btn.closest(".film");
+  const f = films.find((x) => x.id === li.dataset.id);
+  if (!f) return;
+  const s = Number(btn.dataset.s);
+
+  switch (btn.dataset.action) {
+    case "tick": setWatched(f, !f.watched); break;
+    case "del": expanded.delete(f.id); run(store.remove(f.id)); break;
+    case "rate": {
+      const n = Number(btn.dataset.n);
+      run(store.update(f.id, { ["ratings." + me]: f.ratings[me] === n ? 0 : n }));
+      break;
+    }
+    case "toggle":
+      if (expanded.has(f.id)) expanded.delete(f.id); else expanded.add(f.id);
+      render();
+      break;
+    case "ep": {
+      const set = seenSet(f, s - 1);
+      const ep = Number(btn.dataset.e);
+      if (set.has(ep)) set.delete(ep); else set.add(ep);
+      applySeen(f, "s" + s, Array.from(set).sort((a, b) => a - b));
+      break;
+    }
+    case "season-all": {
+      const count = f.seasons[s - 1] || 0;
+      const all = seenSet(f, s - 1).size === count;
+      applySeen(f, "s" + s, all ? [] : Array.from({ length: count }, (_, i) => i + 1));
+      break;
+    }
+    case "kind": run(store.update(f.id, { kind: btn.dataset.kind })); break;
+    case "lookup": runMatchSearch(f.id, f.title); break;
+    case "refresh": applyDetails(f, f.kind, f.tmdbId, null); break;
+    case "match-search": {
+      const q = li.querySelector(".matchq").value.trim();
+      if (q) runMatchSearch(f.id, q);
+      break;
+    }
+    case "match-close": matchState = { id: null, loading: false, results: [], error: "", q: "" }; render(); break;
+    case "pick": {
+      const r = matchState.results[Number(btn.dataset.i)];
+      matchState = { id: null, loading: false, results: [], error: "", q: "" };
+      if (r) applyDetails(f, r.kind, r.id, fromResult(r)); else render();
+      break;
+    }
+  }
+});
+
+els.list.addEventListener("change", (e) => {
+  if (!e.target.matches('input[type="date"]')) return;
+  const li = e.target.closest(".film");
+  run(store.update(li.dataset.id, { plannedDate: e.target.value }));
+});
+
+els.list.addEventListener("keydown", (e) => {
+  if (e.key === "Enter" && e.target.matches(".matchq")) {
+    e.preventDefault();
+    const q = e.target.value.trim();
+    const li = e.target.closest(".film");
+    if (q) runMatchSearch(li.dataset.id, q);
+  }
+});
+
+els.list.addEventListener("toggle", (e) => {
+  const d = e.target;
+  if (d && d.classList && d.classList.contains("season")) {
+    if (d.open) openSeasons.add(d.dataset.sid); else openSeasons.delete(d.dataset.sid);
+  }
+}, true);
+
+/* ---------- Adding ---------- */
+let searchTimer = null;
+let searchSeq = 0;
+
+function hideSuggest() {
+  clearTimeout(searchTimer);
+  searchSeq++;
+  suggestions = [];
+  els.suggest.hidden = true;
+  els.suggest.innerHTML = "";
+}
+function showSuggest(results) {
+  suggestions = results;
+  if (!results.length) { hideSuggest(); return; }
+  els.suggest.innerHTML = results.map((r, i) => '<li><button type="button" data-i="' + i + '">' + resultInner(r) + "</button></li>").join("") +
+    '<li class="hint">Not here? Press Add to save just the title as a ' + (addKind === "series" ? "series" : "film") + ", then use Find details later.</li>";
+  els.suggest.hidden = false;
+}
+
+async function addFromResult(r) {
+  if (films.some((f) => f.tmdbId === r.id && f.kind === r.kind)) {
+    hideSuggest();
+    setStatus("That one is already on the list.", true);
+    return;
+  }
+  setStatus("Adding " + r.title + "...", false);
+  let d;
+  try { d = await tmdbDetails(r.kind, r.id); } catch (e) { d = fromResult(r); }
+  hideSuggest();
+  els.addInput.value = "";
+  run(store.add(blankFilm(d)));
+}
+
+els.addForm.addEventListener("submit", (e) => {
+  e.preventDefault();
+  const title = els.addInput.value.trim().slice(0, 120);
+  if (!title) return;
+  els.addInput.value = "";
+  hideSuggest();
+  els.addInput.focus();
+  run(store.add(blankFilm({ title: title, kind: addKind === "series" ? "series" : "movie" })));
+});
+
+function scheduleSearch(delay) {
+  clearTimeout(searchTimer);
+  const q = els.addInput.value.trim();
+  if (!tmdbKey || q.length < 2) { hideSuggest(); return; }
+  searchTimer = setTimeout(async () => {
+    const seq = ++searchSeq;
+    try {
+      const res = await tmdbSearch(q, addKind === "any" ? "" : addKind);
+      if (seq === searchSeq) showSuggest(res);
+    } catch (e) { if (seq === searchSeq) hideSuggest(); }
+  }, delay);
+}
+
+els.addInput.addEventListener("input", () => scheduleSearch(350));
+
+els.addInput.addEventListener("keydown", (e) => { if (e.key === "Escape") hideSuggest(); });
+
+els.suggest.addEventListener("click", (e) => {
+  const b = e.target.closest("button[data-i]");
+  if (b && suggestions[Number(b.dataset.i)]) addFromResult(suggestions[Number(b.dataset.i)]);
+});
+
+document.addEventListener("click", (e) => {
+  if (!els.suggest.hidden && !els.addArea.contains(e.target)) hideSuggest();
+});
+
+document.querySelectorAll(".kind [data-kind]").forEach((b) => {
+  b.addEventListener("click", () => {
+    addKind = b.dataset.kind;
+    document.querySelectorAll(".kind [data-kind]").forEach((x) => x.setAttribute("aria-pressed", String(x.dataset.kind === addKind)));
+    scheduleSearch(0);
+  });
+});
+
+/* ---------- Tabs and filters ---------- */
+document.querySelectorAll("[data-view]").forEach((b) => b.addEventListener("click", () => { view = b.dataset.view; render(); }));
+document.querySelectorAll("[data-filter]").forEach((b) => b.addEventListener("click", () => { filt.status = b.dataset.filter; render(); }));
+
+els.sortSel.addEventListener("change", () => { sortMode = els.sortSel.value; savePrefs(); render(); });
+document.querySelectorAll("[data-density]").forEach((b) => b.addEventListener("click", () => { density = b.dataset.density; savePrefs(); render(); }));
+
+els.moreBtn.addEventListener("click", () => {
+  const open = els.morePanel.hidden;
+  els.morePanel.hidden = !open;
+  els.moreBtn.setAttribute("aria-expanded", String(open));
+});
+els.fSearch.addEventListener("input", () => { filt.q = els.fSearch.value.trim(); render(); });
+els.fKind.addEventListener("change", () => { filt.kind = els.fKind.value; render(); });
+els.fGenre.addEventListener("change", () => { filt.genre = els.fGenre.value; render(); });
+els.fDecade.addEventListener("change", () => { filt.decade = els.fDecade.value; render(); });
+els.fRating.addEventListener("change", () => { filt.rating = Number(els.fRating.value) || 0; render(); });
+els.fActor.addEventListener("input", () => { filt.actor = els.fActor.value.trim(); render(); });
+els.clearFilters.addEventListener("click", () => {
+  Object.assign(filt, { q: "", kind: "", genre: "", decade: "", actor: "", rating: 0 });
+  els.fSearch.value = ""; els.fKind.value = ""; els.fGenre.value = ""; els.fDecade.value = ""; els.fActor.value = ""; els.fRating.value = "0";
+  render();
+});
+
+/* ---------- Start up ---------- */
+function useLocal(note) {
+  store = makeLocalStore();
+  me = "tim";
+  baseStatus = note;
+  els.app.hidden = false;
+  clearStatus();
+  updateTitle();
+  store.subscribe((items) => { films = items; render(); });
+}
+
+function isConfigured() {
+  return FIREBASE_CONFIG.apiKey && !/^PASTE/.test(FIREBASE_CONFIG.apiKey) && !/^PASTE/.test(FIREBASE_CONFIG.projectId);
+}
+
+function askWho(uid) {
+  return new Promise((resolve) => {
+    els.who.hidden = false;
+    const handler = async (e) => {
+      const b = e.target.closest("[data-who]");
+      if (!b) return;
+      els.whoStatus.textContent = "Saving...";
+      try {
+        await store.setProfile(uid, { who: b.dataset.who });
+        els.who.hidden = true;
+        els.who.removeEventListener("click", handler);
+        resolve({ who: b.dataset.who });
+      } catch (err) {
+        els.whoStatus.textContent = "Couldn't save that. Try again.";
+      }
+    };
+    els.who.addEventListener("click", handler);
+  });
+}
+
+function showFatal(text) {
+  els.fatalText.textContent = text;
+  els.fatal.hidden = false;
+}
+
+async function init() {
+  updateTitle();
+  render();
+  if (!isConfigured()) {
+    useLocal("The shared list isn't set up yet, so films are saved on this device only.");
+    return;
+  }
+  try {
+    store = await makeFirebaseStore();
+  } catch (err) {
+    useLocal("The shared list isn't available, so films are saved on this device only.");
+    return;
+  }
+
+  const doSignOut = () => store.auth.signOut();
+  els.signOut.addEventListener("click", doSignOut);
+  els.fatalSignOut.addEventListener("click", doSignOut);
+
+  els.authForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    els.authStatus.textContent = "Signing in...";
+    try {
+      await store.auth.signIn(els.authEmail.value.trim(), els.authPassword.value);
+      els.authPassword.value = "";
+      els.authStatus.textContent = "";
+    } catch (err) {
+      const bad = ["auth/invalid-credential", "auth/wrong-password", "auth/user-not-found", "auth/invalid-email"];
+      els.authStatus.textContent = bad.indexOf(err && err.code) >= 0
+        ? "That email and password don't match."
+        : "Couldn't sign in. Check your connection and try again.";
+    }
+  });
+
+  store.auth.onChange(async (user) => {
+    els.fatal.hidden = true;
+    if (!user) {
+      store.unsubscribe();
+      films = [];
+      me = "tim";
+      tmdbKey = "";
+      rows.forEach((el) => el.remove());
+      rows.clear();
+      updateTitle();
+      render();
+      els.app.hidden = true;
+      els.who.hidden = true;
+      els.auth.hidden = false;
+      return;
+    }
+    els.auth.hidden = true;
+    try {
+      let profile = await store.getProfile(user.uid);
+      if (!profile || !NAMES[profile.who]) profile = await askWho(user.uid);
+      me = profile.who;
+    } catch (err) {
+      showFatal("Couldn't load your settings. Check that the Firestore rules include the profiles and config sections.");
+      return;
+    }
+
+    tmdbKey = "";
+    try {
+      const cfg = await store.getConfig();
+      if (cfg && typeof cfg.tmdbKey === "string") tmdbKey = cfg.tmdbKey.trim();
+    } catch (err) { tmdbKey = ""; }
+    baseStatus = tmdbKey ? "" : "Film and TV lookup isn't set up yet. You can still add titles by hand.";
+
+    updateTitle();
+    els.app.hidden = false;
+    clearStatus();
+    store.subscribe(
+      (items) => { films = items; render(); },
+      (err) => {
+        if (err && err.code === "permission-denied") {
+          setStatus("This account can't open the shared list. Sign out and use the other login.", true);
+        } else {
+          setStatus("Lost connection to the shared list. Reload the page to reconnect.", true);
+        }
+      }
+    );
+    render();
+  });
+}
+
+init();
+</script>
+</body>
+</html>
